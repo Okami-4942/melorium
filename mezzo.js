@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { registerInteraction } from "./interaction.js";
 // import { texture } from "three/src/nodes/accessors/TextureNode.js";
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
@@ -262,7 +263,7 @@ function createOverlayMaterial(texture) {
   });
 }
 
-function createBook(coverTexturePath, spineTexturePath, position, rotation) {
+function createBook(coverTexturePath, spineTexturePath, position, rotation,bookId) {
   const baseTexture = loadBookTexture('./images/green-ura.jpg');
   const coverTexture = loadBookTexture(coverTexturePath);
   const spineTexture = loadBookTexture(spineTexturePath);
@@ -398,6 +399,15 @@ function createBook(coverTexturePath, spineTexturePath, position, rotation) {
     name: 'hidamari-book',
     object: book,
     halfSize: new THREE.Vector3(bookWidth / 2, bookHeight / 2, totalDepth / 2),
+  });
+
+  registerInteraction({
+    object: book,
+    type: "book",
+    action() {
+      openBookModal(bookId);
+      // ここにモーダルを開く処理を書く
+    }
   });
 
   return book;
@@ -777,8 +787,8 @@ const glbObjects = [
 //本を複製する
 
 glbObjects.forEach(loadGLBObject);
-const book1 = createBook("./images/プラネテス.png", "./images/プラネテス1背.png", new THREE.Vector3(-1.5, 2, 1.5), new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 4));
-const book2 = createBook("./images/メアリー・スーの憂鬱.png", "./images/メアリー・スーの憂鬱3背.png", new THREE.Vector3(1.5, 2, -1.5), new THREE.Euler(-Math.PI / 2, 0, Math.PI * 3 / 4));
+const book1 = createBook("./images/プラネテス.png", "./images/プラネテス1背.png", new THREE.Vector3(-1.5, 2, 1.5), new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 4),1);
+const book2 = createBook("./images/メアリー・スーの憂鬱.png", "./images/メアリー・スーの憂鬱3背.png", new THREE.Vector3(1.5, 2, -1.5), new THREE.Euler(-Math.PI / 2, 0, Math.PI * 3 / 4),2);
 
 //机をつくるなど
 
@@ -926,7 +936,7 @@ function animate() {
     controls.moveRight(velocity.x);
     controls.moveForward(velocity.z);
 
-    const player =controls.getObject();
+    const player = controls.getObject();
     colliders.resolvePlayerPosition(player.position);
   }
 

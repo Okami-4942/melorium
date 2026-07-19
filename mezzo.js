@@ -897,12 +897,6 @@ loader.load('models/table.glb', function (gltf) {
 });
 
 
-// colliders.addObjectLocalBounds({
-//   name: 'ptable',
-//   object: GlassObject,
-//   padding: 0.05,
-// });
-
 modelSet = true;
 
 const bookHighlight = new THREE.PointLight(0xffe1a3, 1.2, 5);
@@ -910,25 +904,6 @@ bookHighlight.position.set(0.2, 2.3, -1.4);
 scene.add(bookHighlight);
 
 //机ここまで
-
-//机を増やす
-
-//   const Dec = GlassObject.clone();
-//   Dec.position.set( 3.5, 0.4,  0);
-
-//   const Aquarium = ptable.clone(true);
-//   table2.position.set( 0, 0.4,  3.5);
-
-//   const Angel = ptable.clone(true);
-//   table3.position.set(-3.5, 0.4,  0);
-
-//   const Sleep = ptable.clone(true);
-//   table4.position.set( 0, 0.4, -3.5);
-
-//   scene.add(Dec);
-//   scene.add(Aquarium);
-//   scene.add(Angel);
-//   scene.add(Sleep);
 
 // 毎フレーム（60回/秒）動かす関数
 function animate() {
@@ -951,7 +926,7 @@ function animate() {
     controls.moveRight(velocity.x);
     controls.moveForward(velocity.z);
 
-    const player = controls.getObject();
+    const player =controls.getObject();
     colliders.resolvePlayerPosition(player.position);
   }
 

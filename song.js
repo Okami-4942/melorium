@@ -26,12 +26,6 @@ function closeSongMenu() {
 // Fキーで開く
 window.addEventListener("keydown", (e) => {
 
-    if (e.code === "KeyF") {
-
-        openSongMenu();
-
-    }
-
     if (e.code === "Escape") {
 
         closeSongMenu();

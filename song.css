@@ -18,7 +18,7 @@
 }
 
 /* ウィンドウ */
-#song-window{
+.song-window{
 
     width: 700px;
     height: 420px;
@@ -49,13 +49,13 @@
     font-size: 40px;
     cursor: pointer;
 
-    color: #222;
+    color: #B98C8F;
 }
 
 /* 曲名 */
 #song-title{
 
-    font-size:52px;
+    font-size:40px;
 
     font-weight:400;
 
@@ -65,28 +65,17 @@
 
 }
 
-/* 作者 */
-#song-artist {
-
-    margin-top: 8px;
-
-    font-size: 24px;
-    font-weight: normal;
-
-    color:#2B2320;
-
-}
 
 /* 解説 */
 #song-description{
 
-    margin-top:90px;
+    margin: top 20px;
 
-    font-size:26px;
+    font-size:25px;
 
     color:#2B2320;
 
-    line-height:1.8;
+    line-height:1.6;
 
 }
 
@@ -95,14 +84,14 @@
     display:flex;
     justify-content:center;
     gap:35px;
-    margin-top:90px;
 }
 
 /* リンク */
 .button-area a{
 
-    width:190px;
-    height:62px;
+     width: 290px;
+    height: 90px;
+
 
     display:flex;
     justify-content:center;
@@ -111,40 +100,17 @@
     background-image:url("../images/link-button.svg");
     background-repeat:no-repeat;
     background-position:center;
-    background-size:contain;
+    background-size:100% 100%;
 
     text-decoration:none;
 
-    color:#B48B8B;
-    font-size:30px;
+    color:#B99A57;
+    font-size:35px;
 
     transition:filter .2s ease;
 
 }
 
-.button-area a {
-
-    width: 220px;
-
-    padding: 15px 0;
-
-    border-radius: 15px;
-
-    background: white;
-
-    color: #222;
-
-    text-align: center;
-    text-decoration: none;
-
-    font-size: 30px;
-
-    transition:
-        background-color .25s,
-        color .25s;
-
-}
-
 .button-area a:hover{
-    color:#C9A06D;
+    color:#B98C8F;
 }

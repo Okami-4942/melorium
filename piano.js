@@ -1,3 +1,4 @@
+
 //インポートから始まるのは全部ここ
 import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -7,6 +8,14 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 console.log(`piano.js loaded`)
+
+// すべてのモデルとテクスチャを読み終えるまでは画面を閉じない
+THREE.DefaultLoadingManager.onLoad = () => {
+  // 読み込み済みのシーンが一度描画されてからフェードアウトする
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => window.hideLoadingScreen?.());
+  });
+};
 
 const yAxis = new THREE.Vector3(0, 1, 0);
 const showColliderHelpers = false; //アシスト線

@@ -23,6 +23,10 @@
   transition: opacity 1s;
 }
 
+#loading-screen.is-hidden {
+  pointer-events: none;
+}
+
 /* 「now loading」とバーを縦並びにする */
 .loading-container {
   display: flex;
@@ -32,11 +36,12 @@
 
 /* テキスト */
 .loading-text {
-  font-size: 3rem;
+  font-size: clamp(2rem, 7vw, 3rem);
   color: #2B2320;
+  letter-spacing: 0.04em;
 
   /* 線との間隔 */
-  margin-bottom: 60px;
+  margin-bottom: clamp(42px, 8vw, 60px);
 }
 
 /* =========================
@@ -45,7 +50,7 @@
 
 .progress-bar {
   /* バーの長さ */
-  width: 600px;
+  width: min(600px, 78vw);
 
   /* 線の太さ */
   height: 3px;
@@ -89,7 +94,7 @@
   width: 55px;
 
   /* 最初は左端 */
-  left: -5.5px;
+  left: 0;
 
   /* バーの真ん中の高さを基準にする */
   top: 50%;
@@ -102,4 +107,12 @@
 
   /* クリック判定を無効にする */
   pointer-events: none;
+}
+
+.loading-percentage {
+  margin-top: 28px;
+  color: #8E897A;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
 }

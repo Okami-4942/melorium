@@ -1,0 +1,150 @@
+/* 初期状態では非表示 */
+#song-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.35);
+
+    z-index: 9999;
+}
+
+/* 表示 */
+#song-overlay.active {
+    display: flex;
+}
+
+/* ウィンドウ */
+#song-window{
+
+    width: 700px;
+    height: 420px;
+
+    background: #EED1D2;
+
+    border-radius: 48px;
+
+    padding: 55px 65px;
+
+    box-sizing:border-box;
+
+    position:relative;
+
+}
+
+/* 閉じるボタン */
+#close-button {
+
+    position: absolute;
+
+    top: 20px;
+    right: 25px;
+
+    border: none;
+    background: none;
+
+    font-size: 40px;
+    cursor: pointer;
+
+    color: #222;
+}
+
+/* 曲名 */
+#song-title{
+
+    font-size:52px;
+
+    font-weight:400;
+
+    margin:0;
+
+    color:#2B2320;
+
+}
+
+/* 作者 */
+#song-artist {
+
+    margin-top: 8px;
+
+    font-size: 24px;
+    font-weight: normal;
+
+    color:#2B2320;
+
+}
+
+/* 解説 */
+#song-description{
+
+    margin-top:90px;
+
+    font-size:26px;
+
+    color:#2B2320;
+
+    line-height:1.8;
+
+}
+
+/* ボタン */
+.button-area{
+    display:flex;
+    justify-content:center;
+    gap:35px;
+    margin-top:90px;
+}
+
+/* リンク */
+.button-area a{
+
+    width:190px;
+    height:62px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background-image:url("../images/link-button.svg");
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:contain;
+
+    text-decoration:none;
+
+    color:#B48B8B;
+    font-size:30px;
+
+    transition:filter .2s ease;
+
+}
+
+.button-area a {
+
+    width: 220px;
+
+    padding: 15px 0;
+
+    border-radius: 15px;
+
+    background: white;
+
+    color: #222;
+
+    text-align: center;
+    text-decoration: none;
+
+    font-size: 30px;
+
+    transition:
+        background-color .25s,
+        color .25s;
+
+}
+
+.button-area a:hover{
+    color:#C9A06D;
+}

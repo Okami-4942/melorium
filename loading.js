@@ -30,6 +30,20 @@ function setLoadingProgress(progress) {
     }
 }
 
+// 0%から100%まで、必ず3秒かけて滑らかに進める
+function animateLoadingProgress(now) {
+    const elapsed = now - loadingStartedAt;
+    const progress = Math.min(elapsed / MINIMUM_LOADING_DURATION_MS, 1);
+
+    setLoadingProgress(progress);
+
+    if (progress < 1) {
+        requestAnimationFrame(animateLoadingProgress);
+    }
+}
+
+requestAnimationFrame(animateLoadingProgress);
+
 
 // ============================
 // ローディング画面を消す関数

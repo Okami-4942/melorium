@@ -9,18 +9,8 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 console.log(`piano.js loaded`)
 
-// モデルとテクスチャの実際の読み込み状況をローディング画面へ反映する
-THREE.DefaultLoadingManager.onStart = () => {
-  window.setLoadingProgress?.(0);
-};
-
-THREE.DefaultLoadingManager.onProgress = (_url, loaded, total) => {
-  window.setLoadingProgress?.(total > 0 ? loaded / total : 0);
-};
-
+// すべてのモデルとテクスチャを読み終えるまでは画面を閉じない
 THREE.DefaultLoadingManager.onLoad = () => {
-  window.setLoadingProgress?.(1);
-
   // 読み込み済みのシーンが一度描画されてからフェードアウトする
   requestAnimationFrame(() => {
     requestAnimationFrame(() => window.hideLoadingScreen?.());

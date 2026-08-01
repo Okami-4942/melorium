@@ -1,0 +1,332 @@
+:root {
+  /* サイト全体で使う基本書体・文字色・背景色です。 */
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: #2b2320;
+  background: #a2b3aa;
+  font-synthesis: none;
+}
+
+* {
+  /* paddingとborderをwidthの内側へ含め、サイズ計算を分かりやすくします。 */
+  box-sizing: border-box;
+}
+
+/* Reactのルートから3D画面までをブラウザ全体の大きさにします。 */
+html,
+body,
+#root,
+.app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible {
+  /* キーボード操作中に、現在選択している要素が分かるよう輪郭を表示します。 */
+  outline: 3px solid #fff7cf;
+  outline-offset: 4px;
+}
+
+.app {
+  /* position: relativeにし、画面上へ重ねるUIの基準にします。 */
+  position: relative;
+  background: #a2b3aa;
+}
+
+.three-scene,
+.three-scene canvas {
+  /* Three.jsのcanvasを親要素いっぱいに広げ、余計なインライン余白を消します。 */
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 3D canvasより手前へ、タイトルとメニューボタンを固定表示します。 */
+.site-header {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px clamp(20px, 4vw, 52px);
+  pointer-events: none;
+}
+
+.site-title {
+  margin: 0;
+  color: #f7f3e9;
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 14px rgb(27 42 35 / 35%);
+}
+
+.menu-trigger {
+  min-width: 96px;
+  padding: 10px 22px;
+  border: 1px solid rgb(255 255 255 / 65%);
+  border-radius: 999px;
+  color: #f7f3e9;
+  background: rgb(43 35 32 / 28%);
+  box-shadow: 0 10px 28px rgb(35 49 41 / 16%);
+  cursor: pointer;
+  /* 親headerはクリックを通しますが、ボタン自身だけはクリックを受け取ります。 */
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+}
+
+.controls-guide {
+  /* 画面右下へ常に表示する、キーボード操作の簡易ガイドです。 */
+  position: fixed;
+  z-index: 10;
+  right: clamp(16px, 3vw, 36px);
+  bottom: clamp(16px, 3vw, 32px);
+  display: flex;
+  gap: 14px;
+  padding: 10px 16px;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  color: #f7f3e9;
+  background: rgb(43 35 32 / 34%);
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.interaction-hint {
+  /* Three.jsから案内文を受け取ったときだけ、照準の下に表示されます。 */
+  position: fixed;
+  z-index: 10;
+  left: 50%;
+  bottom: 13%;
+  margin: 0;
+  padding: 12px 22px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  color: #f7f3e9;
+  background: rgb(43 35 32 / 72%);
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.loading-screen {
+  /* 読み込み中は3D画面とUIの全てを覆います。z-indexはサイト内で最前面です。 */
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #f5f2ec;
+  opacity: 1;
+  transition: opacity 700ms ease;
+}
+
+.loading-screen.is-leaving {
+  /* 準備完了後は透明にし、背後のcanvasを操作できるようにします。 */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-text {
+  margin: 0 0 clamp(42px, 8vw, 60px);
+  font-size: clamp(2rem, 7vw, 3rem);
+  letter-spacing: 0.04em;
+}
+
+.progress-bar {
+  /* 金色の線を進捗バー全体の土台として使います。 */
+  position: relative;
+  width: min(600px, 78vw);
+  height: 3px;
+  background: #b99a57;
+}
+
+.progress {
+  /* Reactから渡されるstyle.widthによって、左から右へ伸びます。 */
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #8e897a;
+}
+
+.loading-note {
+  /* Reactから渡されるstyle.leftによって、進捗の先頭へ移動します。 */
+  position: absolute;
+  top: 50%;
+  width: 55px;
+  transform: translate(-50%, -60%);
+  pointer-events: none;
+}
+
+.loading-percentage {
+  margin: 28px 0 0;
+  color: #8e897a;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+.modal-backdrop {
+  /* 画面全体を暗くし、3D空間よりモーダルへ視線を集めます。 */
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(30 27 24 / 52%);
+  backdrop-filter: blur(7px);
+}
+
+.modal-window {
+  /* 曲とメニューの両方で使う、共通のモーダル本体です。 */
+  position: relative;
+  width: min(680px, 100%);
+  max-height: calc(100vh - 48px);
+  padding: clamp(42px, 7vw, 72px);
+  overflow-y: auto;
+  border: 1px solid rgb(255 255 255 / 60%);
+  border-radius: 42px;
+  background: #eed1d2;
+  box-shadow: 0 28px 80px rgb(34 28 25 / 30%);
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  color: #8c6669;
+  background: transparent;
+  font-family: system-ui, sans-serif;
+  font-size: 2.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-eyebrow {
+  margin: 0 0 10px;
+  color: #967478;
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.modal-window h2 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 400;
+}
+
+.song-artist {
+  margin: 10px 0 0;
+  color: #785e60;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+}
+
+.song-description {
+  margin: 30px 0 36px;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.9;
+}
+
+.song-links,
+.menu-links {
+  /* PCでは二つの音楽リンクを横並びにします。メニュー側は後で一列に上書きします。 */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.song-links a,
+.menu-links a {
+  display: grid;
+  min-height: 66px;
+  place-items: center;
+  padding: 14px 20px;
+  border: 1px solid rgb(112 82 84 / 28%);
+  border-radius: 999px;
+  color: #765e42;
+  background: rgb(255 250 238 / 55%);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.song-links a:hover,
+.menu-links a:hover {
+  transform: translateY(-2px);
+  background: #fffaf0;
+}
+
+.menu-modal {
+  width: min(560px, 100%);
+  background: #e9e2d8;
+}
+
+.menu-links {
+  grid-template-columns: 1fr;
+  margin-top: 34px;
+}
+
+@media (max-width: 640px) {
+  /* 画面幅640px以下では、操作案内とリンクをスマートフォン向けに並べ直します。 */
+  .site-header {
+    padding-top: 18px;
+  }
+
+  .controls-guide {
+    left: 50%;
+    right: auto;
+    width: max-content;
+    max-width: calc(100% - 28px);
+    justify-content: center;
+    gap: 8px;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+  }
+
+  .modal-window {
+    padding: 54px 28px 34px;
+    border-radius: 28px;
+  }
+
+  .song-links {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* OSで「視差効果を減らす」を選んだ利用者には、CSSアニメーションをほぼ無効化します。 */
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

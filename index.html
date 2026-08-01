@@ -1,36 +1,17 @@
-<!-- index.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="loading.css">
-  <title>My First three.js</title>
-</head>
-<body>
-  <div id="loading-screen" role="status" aria-live="polite" aria-label="コンテンツを読み込んでいます">
-    <div class="loading-container">
-      <div class="loading-text">now loading</div>
-      <div class="progress-bar" aria-hidden="true">
-        <div class="progress"></div>
-        <img class="note" src="./images/lloading.svg" alt="">
-      </div>
-      <div class="loading-percentage">0%</div>
-    </div>
-  </div>
-
-  <!-- ここに three.js が自動で <canvas> を作る -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.176.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.176.0/examples/jsm/"
-      }
-    }
-  </script>
-  <script src="./loading.js"></script>
-  <script type="module" src="./mezzo.js"></script>
-  <script type="module" src="./interaction.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="音楽を本に見立てて楽しむ、Three.jsとReactで作られた3Dギャラリー"
+    />
+    <title>Melorium</title>
+  </head>
+  <body>
+    <!-- Reactは、この要素の中に画面を組み立てます。 -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

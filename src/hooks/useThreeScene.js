@@ -5,6 +5,7 @@ export default function useThreeScene({
   containerRef,
   isPaused,
   onReady,
+  onSelectSong,
 }) {
   /*
    * このカスタムHookは、ReactのライフサイクルとThree.jsのライフサイクルをつなぎます。
@@ -26,6 +27,7 @@ export default function useThreeScene({
     const sceneApi = createMeloriumScene({
       container: containerRef.current,
       onReady,
+      onSelectSong,
     });
     sceneApiRef.current = sceneApi;
 
@@ -37,7 +39,7 @@ export default function useThreeScene({
       sceneApi.dispose();
       sceneApiRef.current = null;
     };
-  }, [containerRef, onReady]);
+  }, [containerRef, onReady,onSelectSong]);
 
   useEffect(() => {
     /*

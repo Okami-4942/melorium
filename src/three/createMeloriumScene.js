@@ -159,6 +159,8 @@ function addFloor(scene) {
 export function createMeloriumScene({
   container,
   onReady,
+  // Fキーで選んだ曲IDをReactへ伝えるため、関数を受け取ります。
+  onSelectSong,
 }) {
   /*
    * Reactから受け取る値:
@@ -362,16 +364,16 @@ export function createMeloriumScene({
             child.material =
               child.material?.name === "ガラス"
                 ? new THREE.MeshPhysicalMaterial({
-                    color: 0xffffff,
-                    transmission: 1,
-                    roughness: 0.15,
-                    ior: 1.52,
-                    transparent: true,
-                  })
+                  color: 0xffffff,
+                  transmission: 1,
+                  roughness: 0.15,
+                  ior: 1.52,
+                  transparent: true,
+                })
                 : new THREE.MeshStandardMaterial({
-                    map: tableTexture,
-                    roughness: 0.68,
-                  });
+                  map: tableTexture,
+                  roughness: 0.68,
+                });
             child.castShadow = true;
             child.receiveShadow = true;
           });
@@ -464,16 +466,15 @@ export function createMeloriumScene({
     if (!isPaused && !controls.isLocked) controls.lock();
   };
   const handleKeyDown = (event) => {
-    // Setは同じキーを重複登録しないため、押し続けている状態の管理に向いています。
-    pressedKeys.add(event.code);
-
-    /*
-     * Fキーで曲画面を開く処理は、高校生向けの実装課題です。
-     * focusedSongIdまではThree.js側で判定済みなので、手順書ではこの場所から
-     * Reactへ曲IDを伝え、曲画面を表示する流れを追加します。
-     */
     if (event.code === "KeyF" && !event.repeat && focusedSongId && !isPaused) {
-      // TODO: docs/song-ui-implementation-guide.mdを見ながら実装してください。
+      /*
+       * Pointer Lockを解除するとマウスカーソルが戻り、
+       * モーダルのリンクや×ボタンをクリックできるようになります。
+       */
+      controls.unlock();
+
+      // 例: "hidamari"という曲IDをReact側へ通知します。
+      onSelectSong(focusedSongId);
     }
   };
   // キーを離したらSetから削除し、次フレーム以降の移動を止めます。

@@ -20,6 +20,7 @@ import forteDoorUrl from "../images/fdoorm.png";
 import mezzoDoorUrl from "../images/mdoorm.png";
 import largoDoorUrl from "../images/ldoorm.png";
 import loadingNoteUrl from "../images/lloading.svg";
+import linkButtonUrl from "../images/link-button.svg";
 
 // 用途別のオブジェクトにまとめることで、利用側がassets.models.doorのように読めます。
 export const assets = {
@@ -43,5 +44,6 @@ export const assets = {
   },
   ui: {
     loadingNote: loadingNoteUrl,
+    linkButton: linkButtonUrl,
   },
 };

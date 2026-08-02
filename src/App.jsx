@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import Experience from "./components/Experience.jsx";
 import LoadingScreen from "./components/LoadingScreen.jsx";
+import SongModal from "./components/SongModal.jsx";
+import { songs } from "./data/siteData.js";
 
 export default function App() {
   /*
@@ -12,6 +14,15 @@ export default function App() {
   // 3D素材を全て読み終えたかを保持します。LoadingScreenを閉じる条件に使います。
   const [isSceneReady, setIsSceneReady] = useState(false);
 
+  // nullは「曲を選んでいない」、文字列は「そのIDの曲を選んでいる」という意味です。
+  const [selectedSongId, setSelectedSongId] = useState(null);
+
+  // 曲IDを表示に必要な曲名・説明・URLへ変換します。
+  const selectedSong = selectedSongId ? songs[selectedSongId] : null;
+
+  // 曲画面が開いている間は、背後の3D操作を止めます。
+  const isOverlayOpen = Boolean(selectedSong);
+
   /*
    * useCallbackは再描画後も同じ関数を再利用します。
    * useThreeSceneはコールバックが変わるとシーンを作り直すため、関数を固定して不要な初期化を防ぎます。
@@ -21,7 +32,12 @@ export default function App() {
   return (
     <main className="app">
       {/* UI課題を実装するまでは3D操作を一時停止しないため、falseを渡します。 */}
-      <Experience isPaused={false} onReady={handleSceneReady} />
+      <Experience
+        isPaused={isOverlayOpen}
+        onReady={handleSceneReady}
+        // setState関数を渡すと、Three.jsから届いた曲IDをそのまま保存できます。
+        onSelectSong={setSelectedSongId}
+      />
 
       <header className="site-header">
         <p className="site-title">Melorium</p>
@@ -34,6 +50,11 @@ export default function App() {
 
       {/* 読み込み完了までは、3D画面の手前にローディング画面を表示します。 */}
       <LoadingScreen isReady={isSceneReady} />
+      <SongModal
+        song={selectedSong}
+        // nullへ戻すとsongもnullになり、条件付き表示によって閉じます。
+        onClose={() => setSelectedSongId(null)}
+      />
     </main>
   );
 }

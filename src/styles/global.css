@@ -151,7 +151,123 @@ a:focus-visible {
   letter-spacing: 0.12em;
 }
 
+.modal-backdrop {
+  /* 旧#song-overlayと同じく、画面全体を半透明の黒で覆います。 */
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 35%);
+}
+
+.modal-window {
+  /* position: relativeにすると、×ボタンの基準がこの枠になります。 */
+  position: relative;
+  box-sizing: border-box;
+}
+
+.song-window {
+  /* 旧song.cssの700px × 420px、色、角丸を引き継ぎます。 */
+  width: min(700px, 100%);
+  height: 420px;
+  padding: 55px 65px;
+  border-radius: 48px;
+  background: #eed1d2;
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  padding: 0;
+  border: 0;
+  color: #b98c8f;
+  background: none;
+  font-family: system-ui, sans-serif;
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.song-window h2 {
+  margin: 0;
+  color: #2b2320;
+  font-size: 40px;
+  font-weight: 400;
+}
+
+.song-description {
+  /* 旧CSSの「margin: top 20px」は文法エラーなので、意図を20pxの上余白として直します。 */
+  margin: 20px 0 28px;
+  color: #2b2320;
+  font-size: 25px;
+  line-height: 1.6;
+}
+
+.song-button-area {
+  display: flex;
+  justify-content: center;
+  gap: 35px;
+}
+
+.song-button-area a {
+  position: relative;
+  display: block;
+  width: 290px;
+  max-width: 100%;
+  color: #b99a57;
+  font-size: 35px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.song-button-area img {
+  display: block;
+  width: 100%;
+}
+
+.song-button-area span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.song-button-area a:hover {
+  color: #b98c8f;
+}
+
 @media (max-width: 640px) {
+
+  .song-window {
+    height: auto;
+    padding: 54px 28px 32px;
+    border-radius: 32px;
+  }
+
+  .song-window h2 {
+    font-size: clamp(28px, 9vw, 40px);
+  }
+
+  .song-description {
+    font-size: clamp(17px, 5vw, 25px);
+  }
+
+  .song-button-area {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .song-button-area a {
+    width: min(290px, 100%);
+    font-size: clamp(24px, 8vw, 35px);
+  }
+
   /* 画面幅640px以下では、操作案内をスマートフォン向けに並べ直します。 */
   .site-header {
     padding-top: 18px;
@@ -170,6 +286,7 @@ a:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   /* OSで「視差効果を減らす」を選んだ利用者には、CSSアニメーションをほぼ無効化します。 */
   *,
   *::before,

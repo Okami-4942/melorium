@@ -41,6 +41,8 @@ ReactはメニューやモーダルなどのUIを担当し、Three.jsはcanvas�
 - モーダル表示中に3D操作を止める仕組み
 - 旧実装より進めた箇所と、現在残っている制約
 
+3つの空間を復元し、ドアへ近づいたときに別の部屋へ移動する機能は、学習用の実装課題として [`docs/door-room-transition-guide.md`](./docs/door-room-transition-guide.md) に手順をまとめています。現在はまだ実装されていません。
+
 ## よく使うコマンド
 
 ```bash

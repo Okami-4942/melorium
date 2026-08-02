@@ -6,6 +6,7 @@ export default function useThreeScene({
   isPaused,
   onReady,
   onSelectSong,
+  onInteractionChange,
 }) {
   /*
    * このカスタムHookは、ReactのライフサイクルとThree.jsのライフサイクルをつなぎます。
@@ -28,6 +29,7 @@ export default function useThreeScene({
       container: containerRef.current,
       onReady,
       onSelectSong,
+      onInteractionChange,
     });
     sceneApiRef.current = sceneApi;
 
@@ -39,7 +41,7 @@ export default function useThreeScene({
       sceneApi.dispose();
       sceneApiRef.current = null;
     };
-  }, [containerRef, onReady,onSelectSong]);
+  }, [containerRef, onInteractionChange,onReady,onSelectSong,]);
 
   useEffect(() => {
     /*

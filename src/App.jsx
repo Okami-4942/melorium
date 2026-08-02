@@ -3,6 +3,7 @@ import Experience from "./components/Experience.jsx";
 import LoadingScreen from "./components/LoadingScreen.jsx";
 import SongModal from "./components/SongModal.jsx";
 import { songs } from "./data/siteData.js";
+import MenuModal from "./components/MenuModal.jsx";
 
 export default function App() {
   /*
@@ -20,8 +21,11 @@ export default function App() {
   // 曲IDを表示に必要な曲名・説明・URLへ変換します。
   const selectedSong = selectedSongId ? songs[selectedSongId] : null;
 
-  // 曲画面が開いている間は、背後の3D操作を止めます。
-  const isOverlayOpen = Boolean(selectedSong);
+  // falseなら閉じている、trueなら開いている状態です。
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // 曲画面かメニューのどちらかが開いていれば、背後の3D操作を止めます。
+  const isOverlayOpen = Boolean(selectedSong) || isMenuOpen;
 
   /*
    * useCallbackは再描画後も同じ関数を再利用します。
@@ -41,6 +45,14 @@ export default function App() {
 
       <header className="site-header">
         <p className="site-title">Melorium</p>
+        <button
+          className="menu-trigger"
+          type="button"
+          aria-label="メニューを開く"
+          onClick={() => setIsMenuOpen(true)}
+        >
+          メニュー
+        </button>
       </header>
 
       <div className="controls-guide" aria-label="操作方法">
@@ -55,6 +67,10 @@ export default function App() {
         // nullへ戻すとsongもnullになり、条件付き表示によって閉じます。
         onClose={() => setSelectedSongId(null)}
       />
+      <MenuModal
+  isOpen={isMenuOpen}
+  onClose={() => setIsMenuOpen(false)}
+/>
     </main>
   );
 }

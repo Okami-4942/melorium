@@ -18,8 +18,12 @@ export default function SongModal({ song, onClose }) {
         <>
           {/* 旧画面の「曲名/作者」という一行を、選択した曲の実データで表示します。 */}
           <h2 id="song-title">
-            {song.title} / {song.artist}
+            {song.title} 
           </h2>
+
+          <h3 className="song-artist">
+            {song.artist}
+          </h3>
 
           <p className="song-description">{song.description}</p>
 

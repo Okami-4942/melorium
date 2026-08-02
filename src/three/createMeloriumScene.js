@@ -161,6 +161,8 @@ export function createMeloriumScene({
   onReady,
   // Fキーで選んだ曲IDをReactへ伝えるため、関数を受け取ります。
   onSelectSong,
+  // 本へ照準が合った・外れた変化をReactへ伝える関数です。
+  onInteractionChange,
 }) {
   /*
    * Reactから受け取る値:
@@ -426,6 +428,12 @@ export function createMeloriumScene({
     focusedSongId = nextSongId;
   };
 
+  /*
+ * 本が見つかったときは案内文、見失ったときは空文字を送ります。
+ * 毎フレームではなく値が変化したときだけ送るため、不要な再描画を防げます。
+ */
+  onInteractionChange(nextSongId ? "Fキーで開く" : "");
+
   const renderFrame = () => {
     // 次のブラウザ描画タイミングでも同じ関数を呼び、アニメーションループを作ります。
     animationFrameId = requestAnimationFrame(renderFrame);
@@ -466,14 +474,12 @@ export function createMeloriumScene({
     if (!isPaused && !controls.isLocked) controls.lock();
   };
   const handleKeyDown = (event) => {
-    if (event.code === "KeyF" && !event.repeat && focusedSongId && !isPaused) {
-      /*
-       * Pointer Lockを解除するとマウスカーソルが戻り、
-       * モーダルのリンクや×ボタンをクリックできるようになります。
-       */
-      controls.unlock();
+    pressedKeys.add(event.code);
 
-      // 例: "hidamari"という曲IDをReact側へ通知します。
+    if (event.code === "KeyF" && !event.repeat && focusedSongId && !isPaused) {
+      // 曲画面と操作案内が重ならないよう、先に空文字へ戻します。
+      onInteractionChange("");
+      controls.unlock();
       onSelectSong(focusedSongId);
     }
   };

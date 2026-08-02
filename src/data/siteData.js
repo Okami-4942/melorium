@@ -38,7 +38,7 @@ export const songs = {
   },
 };
 
-// MenuModalはこの配列をmap()し、要素の数だけリンクを表示します。
+// UI課題で作るMenuModalは、この配列をmap()して要素の数だけリンクを表示します。
 export const menuLinks = [
   {
     label: "使用曲プレイリスト",

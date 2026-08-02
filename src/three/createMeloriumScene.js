@@ -159,15 +159,11 @@ function addFloor(scene) {
 export function createMeloriumScene({
   container,
   onReady,
-  onSelectSong,
-  onInteractionChange,
 }) {
   /*
    * Reactから受け取る値:
    * - container: canvasを追加するdiv
    * - onReady: 全素材を読み終えたことをReactへ伝える関数
-   * - onSelectSong: Fキーで選んだ曲IDをReactへ伝える関数
-   * - onInteractionChange: 操作案内の文章をReactへ伝える関数
    */
 
   // dispose後に遅れて読み込みが完了しても、古いシーンへ追加しないための印です。
@@ -421,12 +417,11 @@ export function createMeloriumScene({
     }
 
     /*
-     * 同じ本を見続けている間はReactへ同じ値を送りません。
-     * 毎フレームsetStateすると不要な再描画が起きるため、変化したときだけ通知します。
+     * 同じ本を見続けている間は値を更新しません。
+     * この変化をReactへ通知して案内文を表示する処理は、高校生向けの実装課題として残しています。
      */
     if (focusedSongId === nextSongId) return;
     focusedSongId = nextSongId;
-    onInteractionChange(nextSongId ? "Fキーでこの本を開く" : "");
   };
 
   const renderFrame = () => {
@@ -473,12 +468,12 @@ export function createMeloriumScene({
     pressedKeys.add(event.code);
 
     /*
-     * event.repeatを確認し、Fキーを押し続けても一度だけモーダルを開きます。
-     * Reactへ曲IDを渡す前にPointer Lockを解除し、モーダルをマウスで操作できるようにします。
+     * Fキーで曲画面を開く処理は、高校生向けの実装課題です。
+     * focusedSongIdまではThree.js側で判定済みなので、手順書ではこの場所から
+     * Reactへ曲IDを伝え、曲画面を表示する流れを追加します。
      */
     if (event.code === "KeyF" && !event.repeat && focusedSongId && !isPaused) {
-      controls.unlock();
-      onSelectSong(focusedSongId);
+      // TODO: docs/song-ui-implementation-guide.mdを見ながら実装してください。
     }
   };
   // キーを離したらSetから削除し、次フレーム以降の移動を止めます。

@@ -1,17 +1,18 @@
 # Reactリファクタリング実装ガイド
 
-このドキュメントは、旧JavaScript版からReact版へ移行した内容を説明するものです。特に、コードを整理しただけの箇所と、旧実装では途中だった機能を今回完成させた箇所を区別して記録しています。
+このドキュメントは、旧JavaScript版からReact版へ移行した内容を説明するものです。特に、完成済みの土台と、高校生がReactを学びながら実装する課題を区別して記録しています。
 
 ## 1. 今回の変更範囲
 
-変更内容は、次の四種類に分けられます。
+変更内容は、次の五種類に分けられます。
 
 | 分類 | 内容 | 代表的なファイル |
 | --- | --- | --- |
 | 既存機能の維持 | 3D空間、本、机、ドア、WASD移動、3秒ローディング | `src/three/`, `LoadingScreen.jsx` |
-| Reactへの置き換え | HTMLで直接作っていた画面をコンポーネント化 | `src/App.jsx`, `src/components/` |
-| 途中だった機能の完成 | 本への照準判定、Fキー、曲モーダルの接続 | `createMeloriumScene.js`, `SongModal.jsx` |
-| 新しく追加した補助機能 | 操作案内、モーダル中の一時停止、後片付け、アクセシビリティ | `App.jsx`, `Modal.jsx`, `useThreeScene.js` |
+| Reactへの置き換え | アプリ開始、ローディング、Three.js表示場所をコンポーネント化 | `src/App.jsx`, `src/components/` |
+| 課題用に用意した土台 | 本への照準判定、曲データ、3D操作の一時停止API | `createMeloriumScene.js`, `siteData.js`, `useThreeScene.js` |
+| 高校生が実装する部分 | メニュー、近接案内、Fキー接続、曲UI、部屋移動 | `docs/`内の三つの手順書 |
+| 新しく追加した補助機能 | フレームレート非依存移動、後片付け、素材の一括管理 | `src/three/`, `assets.js`, `useThreeScene.js` |
 
 曲名以外の説明文、アーティスト名、YouTube・Spotifyの検索URLは、旧画面がサンプル表示だったため今回仮データとして補いました。正式な情報が決まったら `src/data/siteData.js` を修正してください。
 
@@ -37,16 +38,14 @@ React版は、画面と3D処理の責任を分けています。
 ```text
 App.jsx（画面全体の状態を管理）
 ├── LoadingScreen（ローディング表示）
-├── SongModal（選択中の曲を表示）
-├── MenuModal（サイトメニュー）
 └── Experience（Three.jsを置く場所）
     └── useThreeScene（ReactとThree.jsの橋渡し）
         └── createMeloriumScene（3D空間を作成・更新）
 ```
 
-Reactは「現在どの画面を見せるか」を管理し、Three.jsは「3D空間で何を描くか」を管理します。Three.jsが本を見つけたときは、コールバック関数を通してReactへ結果だけを伝えます。
+現在は学習開始時の構成なので、`MenuModal`と`SongModal`はまだありません。課題ではAppの子としてこの二つを追加します。完成後も、Reactは「現在どの画面を見せるか」、Three.jsは「3D空間で何を描くか」を担当します。
 
-## 3. 旧実装より先まで進めた箇所
+## 3. 旧実装より先まで進めた土台と、残している課題
 
 ### 3.1 本を見てFキーで曲を開く機能
 
@@ -56,29 +55,31 @@ Reactは「現在どの画面を見せるか」を管理し、Three.jsは「3D�
 
 また、旧`mezzo.js`は本を登録するときに`openBookModal(bookId)`を呼ぶ予定でしたが、この関数は定義されていませんでした。そのため「対象の登録」から「モーダルを開く」までがつながっていない状態でした。
 
-#### 今回の実装
+#### 現在実装済みの土台
 
 1. `createBook.js`で、本を構成する全てのMeshへ`child.userData.songId`を設定します。
 2. `createMeloriumScene.js`で、本のMeshを`interactableMeshes`へ登録します。
 3. 毎フレーム、画面中央から`Raycaster`という見えない線を飛ばします。
 4. 3メートル以内の本に線が当たったら、その本の`songId`を`focusedSongId`へ保存します。
-5. Fキーが押されたら`onSelectSong(focusedSongId)`を呼びます。
-6. `App.jsx`へ曲IDが渡り、`selectedSongId`が更新されます。
-7. Reactが再描画され、対応する`SongModal`が表示されます。
+5. 前回と選択中の本が変わったときだけ、`focusedSongId`を更新します。
+
+Fキーの`if`文にはTODOコメントを置いてあります。ここから先の「Reactへ曲IDを渡す」「選択曲をstateへ保存する」「曲UIを表示する」は高校生向け課題です。
 
 ```text
 照準が本に当たる
   ↓
 RaycasterがsongIdを取得
   ↓
-FキーでonSelectSong(songId)を呼ぶ
+ここまでは実装済み
+  ↓
+FキーでonSelectSong(songId)を呼ぶ（課題）
   ↓
 AppのselectedSongIdが変わる
   ↓
-SongModalが表示される
+SongModalが表示される（課題）
 ```
 
-この処理では、Three.jsからモーダルのDOMを直接操作していません。Three.jsはIDをReactへ渡し、表示の判断はReactに任せています。これが今回の構成で最も重要な役割分担です。
+課題の詳しい実装順は[`song-ui-implementation-guide.md`](./song-ui-implementation-guide.md)にあります。Three.jsから曲画面のDOMを直接操作せず、IDだけをReactへ渡すことが最も重要な役割分担です。
 
 ### 3.2 曲モーダルを実際の3D画面へ接続
 
@@ -86,13 +87,14 @@ SongModalが表示される
 
 旧`song.html`と`song.js`には曲モーダルの見た目がありましたが、メインの`index.html`とは別ページでした。`openSongMenu()`を呼ぶ処理もなく、`controls`変数は別ファイルから参照できない状態でした。
 
-#### 今回の実装
+#### 高校生が実装する内容
 
-- `SongModal.jsx`は、受け取った`song`があるときだけ曲情報を表示します。
-- 共通の開閉処理は`Modal.jsx`へまとめました。
-- 閉じるボタン、背景クリック、Escapeキーの三つで閉じられます。
-- モーダルを開いた直後、キーボード利用者が操作しやすいよう閉じるボタンへフォーカスを移します。
-- 外部リンクには`target="_blank"`と`rel="noreferrer"`を設定しています。
+- `SongModal.jsx`を新しく作る
+- `selectedSongId`を`App.jsx`のstateとして管理する
+- 閉じるボタン、背景クリック、Escapeキーで閉じる
+- 開いた直後に閉じるボタンへフォーカスを移す
+- 外部リンクを安全に別タブで開く
+- 旧`song.css`の700px × 420px、ピンク色、角丸、リンク画像を引き継ぐ
 
 Reactでは「DOMへ`active`クラスを付ける」のではなく、「表示に必要なデータが存在するか」で表示を決めます。
 
@@ -101,23 +103,27 @@ const selectedSong = selectedSongId ? songs[selectedSongId] : null;
 <SongModal song={selectedSong} />
 ```
 
+旧デザインの仕様、完成形、詳しい日本語コメント付きの実装例を[`song-ui-implementation-guide.md`](./song-ui-implementation-guide.md)へ分けています。
+
 ### 3.3 メニューをメイン画面へ統合
 
 #### 以前の状態
 
 旧メニューは`menu.html`という別ページで、jQueryとModaalライブラリに依存していました。メインの3D画面にはメニューを開く入口がありませんでした。
 
-#### 今回の実装
+#### 高校生が実装する内容
 
-- `App.jsx`の右上へMenuボタンを設置しました。
-- `isMenuOpen`というstateで開閉を管理します。
-- メニューのリンクデータは`siteData.js`へ分けました。
-- `menuLinks.map()`を使い、リンクが増えても同じJSXをコピーしない構成にしました。
-- 曲モーダルと共通の`Modal`コンポーネントを再利用しています。
+- `App.jsx`の右上へメニューボタンを置く
+- `isMenuOpen`というstateで開閉を管理する
+- 用意済みの`menuLinks`を`map()`して二つのリンクを作る
+- 旧`menu.css`の500pxの円、ベージュ色、`menu-button.svg`を引き継ぐ
+- jQueryとModaalを使わず、Reactの条件付き表示で開閉する
+
+本へ近づいたときの「Fキーで開く」表示も含め、[`ui-implementation-guide.md`](./ui-implementation-guide.md)に手順をまとめています。
 
 ### 3.4 モーダル表示中に3D操作を止める機能
 
-モーダルが開いているのにマウス視点操作やWASD移動が続くと、ユーザーは文章を読みにくくなります。そこで、曲モーダルかメニューのどちらかが開いている間は3D操作を停止します。
+メニューや曲画面が開いているのにマウス視点操作やWASD移動が続くと、ユーザーは文章を読みにくくなります。そのための`isPaused`と`setPaused()`は土台として実装済みです。現在の`App.jsx`はUIが未実装なので`false`を渡しています。
 
 ```text
 App.jsx: isOverlayOpenを計算
@@ -129,7 +135,7 @@ useThreeScene.js: Three.jsのAPIへ伝える
 createMeloriumScene.js: キーを消去しPointer Lockを解除
 ```
 
-ここではReactのstateをThree.jsが直接読みません。`setPaused()`という小さな公開APIだけを使い、依存関係を単純にしています。
+課題では`isMenuOpen || Boolean(selectedSong)`を`isOverlayOpen`として計算し、`Experience`へ渡します。ReactのstateをThree.jsが直接読まず、`setPaused()`という小さな公開APIだけを使うため、依存関係を単純に保てます。
 
 ### 3.5 フレームレートに依存しない移動
 
@@ -182,7 +188,7 @@ Reactのコンポーネントは、表示されたり消えたりします。表
 - 本の形状生成を`createBook.js`へ分離
 - 当たり判定を`CollisionSystem.js`へ分離
 - 曲やリンクを`siteData.js`へ分離
-- UIの見た目を`global.css`へ統合
+- 現在実装済みの共通UIを`global.css`へ整理
 - jQueryとModaalへの依存を削除
 - ESLintを追加し、未定義変数や未使用コードを検出可能に変更
 
@@ -206,9 +212,13 @@ Reactのコンポーネントは、表示されたり消えたりします。表
 
 曲説明、アーティスト名、外部URLは仮データを含みます。公開前に内容とリンク先を確認してください。
 
+### メニュー・近接案内・曲画面
+
+この三つは高校生向けの実装課題です。現在の画面には表示されず、Fキーを押しても曲画面は開きません。先に[`song-ui-implementation-guide.md`](./song-ui-implementation-guide.md)、続いて[`ui-implementation-guide.md`](./ui-implementation-guide.md)を進めてください。
+
 ### 実機確認
 
-Lint、本番ビルド、ローカル配信までは確認しています。画面の見た目、Pointer Lock、WASD移動、本への照準、Fキー、モーダルの一連の操作は、実ブラウザで最終確認してください。
+Lintと本番ビルドに加え、基礎となる3D画面までは確認対象です。課題実装後は、画面の見た目、Pointer Lock、WASD移動、近接案内、Fキー、曲画面の一連の操作を実ブラウザで最終確認してください。
 
 ## 6. 曲を追加する方法
 
@@ -252,7 +262,7 @@ newSong: {
 }
 ```
 
-一致していれば、Raycasterが本を見つけたときにReactが正しい曲情報を表示します。
+一致していれば、曲UI課題の完成後にRaycasterが本を見つけ、Reactが正しい曲情報を表示できます。
 
 ## 7. React初心者向け用語
 
@@ -267,10 +277,11 @@ newSong: {
 
 ## 8. 学習するときの確認課題
 
-1. `siteData.js`の曲名を変え、モーダルへ反映されることを確認する。
-2. `MenuModal.jsx`で`map()`が一つのリンクデータを一つの`a`要素へ変換する流れを追う。
-3. `App.jsx`の`isMenuOpen`を手動で`true`にし、条件付き表示を確認する。
-4. `INTERACTION_DISTANCE`を変え、本を開ける距離がどう変わるか確認する。
-5. `WALK_SPEED`を変え、経過時間を使った移動速度を確認する。
+1. メニュー手順書に沿って`MenuModal.jsx`を作り、`map()`の流れを追う。
+2. `isMenuOpen`を切り替え、stateによる条件付き表示を確認する。
+3. 近接案内を実装し、`INTERACTION_DISTANCE`で表示距離が変わることを確認する。
+4. 曲UI手順書に沿って、Fキーから`selectedSongId`まで値が渡る流れを説明する。
+5. `siteData.js`の曲名を変え、自分で作った曲画面へ反映されることを確認する。
+6. `WALK_SPEED`を変え、経過時間を使った移動速度を確認する。
 
 変更後は`npm run lint`と`npm run build`を実行し、文法エラーと公開用ビルドを確認してください。

@@ -16,50 +16,52 @@ const ROOM_RADIUS = 6.2;
 const PLAYER_HEIGHT = 2.6;
 const WALK_SPEED = 2.4;
 const INTERACTION_DISTANCE = 3;
+const MAIN_BACKGROUND_COLOR = 0xadadad;
+const MAIN_FLOOR_COLOR = 0x7d7d7d;
+
+// 旧main.jsではテーブルがコメントアウトされていたため、初期部屋では読み込みません。
+const SHOW_TABLES = false;
 
 /*
+ * 旧main.jsにあったForte・Mezzo・Pianoの三つのドアを再現します。
  * 同じドアモデルを三回読み込む代わりに、違う値だけを配列へまとめます。
  * positionは[x, y, z]、rotationYはY軸まわりの回転角度（ラジアン）です。
  */
 const doorSettings = [
   {
-    name: "piano-door",
-    textureUrl: assets.textures.pianoDoor,
+    name: "forte-door",
+    textureUrl: assets.textures.forteDoor,
     position: [5.8, 1.95, 0],
     rotationY: Math.PI,
   },
   {
-    name: "forte-door",
-    textureUrl: assets.textures.forteDoor,
+    name: "mezzo-door",
+    textureUrl: assets.textures.mezzoDoor,
     position: [-2.9, 1.95, 5.023],
     rotationY: Math.PI / 3,
   },
   {
-    name: "largo-door",
-    textureUrl: assets.textures.largoDoor,
+    name: "piano-door",
+    textureUrl: assets.textures.pianoDoor,
     position: [-2.9, 1.95, -5.023],
     rotationY: -Math.PI / 3,
   },
 ];
 
 /*
- * 本も「曲ID・画像・位置・角度」だけをデータとして定義します。
- * songIdはsiteData.jsのsongsにあるキーと一致させる必要があります。
+ * 旧main.jsでは「陽だまりのセツナ」が中央奥に一冊置かれていました。
+ * scaleとedgeColorも設定へ含め、当時の大きさと赤い表紙の縁を再現します。
  */
 const bookSettings = [
   {
-    songId: "planetes",
-    coverTextureUrl: assets.textures.planetesCover,
-    spineTextureUrl: assets.textures.planetesSpine,
-    position: new THREE.Vector3(-1.5, 2, 1.5),
-    rotation: new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 4),
-  },
-  {
-    songId: "marySue",
-    coverTextureUrl: assets.textures.marySueCover,
-    spineTextureUrl: assets.textures.marySueSpine,
-    position: new THREE.Vector3(1.5, 2, -1.5),
-    rotation: new THREE.Euler(-Math.PI / 2, 0, (Math.PI * 3) / 4),
+    songId: "hidamari",
+    backTextureUrl: assets.textures.mainBookBack,
+    coverTextureUrl: assets.textures.hidamariCover,
+    spineTextureUrl: assets.textures.hidamariSpine,
+    position: new THREE.Vector3(0, (1.05 * (790 / 569)) / 2 + 0.16, -2.6),
+    rotation: new THREE.Euler(0, 0, 0),
+    scale: 1,
+    edgeColor: 0x7a1f20,
   },
 ];
 
@@ -144,7 +146,7 @@ function addFloor(scene) {
   const floor = new THREE.Mesh(
     new THREE.CylinderGeometry(ROOM_RADIUS, ROOM_RADIUS, 0.3, 64),
     new THREE.MeshStandardMaterial({
-      color: 0xa1eda1,
+      color: MAIN_FLOOR_COLOR,
       roughness: 1,
       metalness: 0,
     }),
@@ -209,15 +211,15 @@ export function createMeloriumScene({
     });
   };
 
-  // Sceneは全3Dオブジェクトを入れる舞台です。背景色は旧mezzo.jsの色を引き継いでいます。
+  // Sceneは全3Dオブジェクトを入れる舞台です。背景色は旧main.jsの灰色を引き継いでいます。
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xa2b3aa);
+  scene.background = new THREE.Color(MAIN_BACKGROUND_COLOR);
 
   /*
    * PerspectiveCameraの引数は「視野角・縦横比・手前の描画距離・奥の描画距離」です。
    * 縦横比は直後のresize()で実際の画面サイズへ更新します。
    */
-  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 1000);
   camera.position.set(0, PLAYER_HEIGHT, 0);
   addCrosshair(camera);
   scene.add(camera);
@@ -261,7 +263,6 @@ export function createMeloriumScene({
     const book = createBook({
       textureLoader,
       renderer,
-      backTextureUrl: assets.textures.bookBack,
       ...setting,
     });
     scene.add(book);
@@ -326,64 +327,66 @@ export function createMeloriumScene({
     (error) => console.error("ドアモデルを読み込めませんでした。", error),
   );
 
-  // テーブルもGLBを一度読み込み、四箇所へcloneして配置します。
-  gltfLoader.load(
-    assets.models.table,
-    (gltf) => {
-      if (isDisposed) {
-        disposeObject(gltf.scene);
-        return;
-      }
+  // サブ部屋用のテーブル生成処理は残し、旧main.jsと同じ初期表示では実行しません。
+  if (SHOW_TABLES) {
+    gltfLoader.load(
+      assets.models.table,
+      (gltf) => {
+        if (isDisposed) {
+          disposeObject(gltf.scene);
+          return;
+        }
 
-      // 旧実装と同じ画像をテーブルの不透明部分へ貼ります。
-      const tableTexture = textureLoader.load(assets.textures.largoDoor);
-      tableTexture.colorSpace = THREE.SRGBColorSpace;
-      tableTexture.flipY = false;
-      tableTexture.wrapS = THREE.RepeatWrapping;
-      tableTexture.wrapT = THREE.RepeatWrapping;
-      tableTexture.repeat.set(1, 3);
+        // 旧実装と同じ画像をテーブルの不透明部分へ貼ります。
+        const tableTexture = textureLoader.load(assets.textures.largoDoor);
+        tableTexture.colorSpace = THREE.SRGBColorSpace;
+        tableTexture.flipY = false;
+        tableTexture.wrapS = THREE.RepeatWrapping;
+        tableTexture.wrapT = THREE.RepeatWrapping;
+        tableTexture.repeat.set(1, 3);
 
-      // 配置だけを配列へまとめ、同じclone処理をforEachで再利用します。
-      const positions = [
-        [1.5, 0.4, 1.5],
-        [1.5, 0.4, -1.5],
-        [-1.5, 0.4, 1.5],
-        [-1.5, 0.4, -1.5],
-      ];
+        // 配置だけを配列へまとめ、同じclone処理をforEachで再利用します。
+        const positions = [
+          [1.5, 0.4, 1.5],
+          [1.5, 0.4, -1.5],
+          [-1.5, 0.4, 1.5],
+          [-1.5, 0.4, -1.5],
+        ];
 
-      positions.forEach((position) => {
-        const table = gltf.scene.clone(true);
-        table.scale.setScalar(0.3);
-        table.position.fromArray(position);
-        /*
-         * GLB内のMaterial名が「ガラス」なら透過材質、それ以外なら画像付き材質へ差し替えます。
-         * optional chainingの?.により、Materialが無いMeshでもエラーになりません。
-         */
-        table.traverse((child) => {
-          if (!child.isMesh) return;
-          child.material =
-            child.material?.name === "ガラス"
-              ? new THREE.MeshPhysicalMaterial({
-                  color: 0xffffff,
-                  transmission: 1,
-                  roughness: 0.15,
-                  ior: 1.52,
-                  transparent: true,
-                })
-              : new THREE.MeshStandardMaterial({
-                  map: tableTexture,
-                  roughness: 0.68,
-                });
-          child.castShadow = true;
-          child.receiveShadow = true;
+        positions.forEach((position) => {
+          const table = gltf.scene.clone(true);
+          table.scale.setScalar(0.3);
+          table.position.fromArray(position);
+          /*
+           * GLB内のMaterial名が「ガラス」なら透過材質、それ以外なら画像付き材質へ差し替えます。
+           * optional chainingの?.により、Materialが無いMeshでもエラーになりません。
+           */
+          table.traverse((child) => {
+            if (!child.isMesh) return;
+            child.material =
+              child.material?.name === "ガラス"
+                ? new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    transmission: 1,
+                    roughness: 0.15,
+                    ior: 1.52,
+                    transparent: true,
+                  })
+                : new THREE.MeshStandardMaterial({
+                    map: tableTexture,
+                    roughness: 0.68,
+                  });
+            child.castShadow = true;
+            child.receiveShadow = true;
+          });
+          scene.add(table);
+          collisions.add(table);
         });
-        scene.add(table);
-        collisions.add(table);
-      });
-    },
-    undefined,
-    (error) => console.error("テーブルモデルを読み込めませんでした。", error),
-  );
+      },
+      undefined,
+      (error) => console.error("テーブルモデルを読み込めませんでした。", error),
+    );
+  }
 
   const resize = () => {
     /*

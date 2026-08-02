@@ -21,6 +21,8 @@ export function createBook({
   position,
   rotation,
   songId,
+  scale = 0.7,
+  edgeColor = 0x1b2f23,
 }) {
   // 全ての本用テクスチャに共通する色空間・繰り返し・鮮明さの設定です。
   const loadTexture = (url) => {
@@ -40,7 +42,8 @@ export function createBook({
   book.name = `book-${songId}`;
   book.position.copy(position);
   book.rotation.copy(rotation);
-  book.scale.setScalar(0.7);
+  // 部屋ごとに本の大きさを再現できるよう、呼び出し側からscaleを受け取ります。
+  book.scale.setScalar(scale);
 
   // 表紙画像の縦横比と背表紙画像の比率から、本の各寸法を計算します。
   const bookWidth = 1.05;
@@ -74,7 +77,8 @@ export function createBook({
       clearcoatRoughness: 0.18,
       side: THREE.FrontSide,
     });
-  const coverEdgeMaterial = createSolidMaterial(0x1b2f23, 0.82);
+  // 表紙の縁色も部屋ごとのテーマカラーに合わせて変更できます。
+  const coverEdgeMaterial = createSolidMaterial(edgeColor, 0.82);
   const pageMaterial = createSolidMaterial(0xf2ead7);
   const pageEdgeMaterial = createSolidMaterial(0xd6ccb4);
 

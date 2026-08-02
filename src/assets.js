@@ -8,12 +8,16 @@
 import doorModelUrl from "../models/door.glb?url";
 import tableModelUrl from "../models/table.glb?url";
 import greenBackUrl from "../images/green-ura.jpg";
+import redBackUrl from "../images/red-ura.jpg";
 import planetesCoverUrl from "../images/プラネテス.png";
 import planetesSpineUrl from "../images/プラネテス1背.png";
 import marySueCoverUrl from "../images/メアリー・スーの憂鬱.png";
 import marySueSpineUrl from "../images/メアリー・スーの憂鬱3背.png";
+import hidamariCoverUrl from "../images/陽だまりのセツナ.png";
+import hidamariSpineUrl from "../images/陽だまりのセツナ1背.png";
 import pianoDoorUrl from "../images/pdoorm.png";
 import forteDoorUrl from "../images/fdoorm.png";
+import mezzoDoorUrl from "../images/mdoorm.png";
 import largoDoorUrl from "../images/ldoorm.png";
 import loadingNoteUrl from "../images/lloading.svg";
 
@@ -25,12 +29,16 @@ export const assets = {
   },
   textures: {
     bookBack: greenBackUrl,
+    mainBookBack: redBackUrl,
     planetesCover: planetesCoverUrl,
     planetesSpine: planetesSpineUrl,
     marySueCover: marySueCoverUrl,
     marySueSpine: marySueSpineUrl,
+    hidamariCover: hidamariCoverUrl,
+    hidamariSpine: hidamariSpineUrl,
     pianoDoor: pianoDoorUrl,
     forteDoor: forteDoorUrl,
+    mezzoDoor: mezzoDoorUrl,
     largoDoor: largoDoorUrl,
   },
   ui: {

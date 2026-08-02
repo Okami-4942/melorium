@@ -1,86 +1,104 @@
-# ドアで3つの部屋を移動する機能 実装手順書
+# メイン部屋から3つの部屋へ移動する機能 実装手順書
 
-## この手順書の目的
+## この手順書で作るもの
 
-この手順書では、現在一つだけ表示されている部屋を、次の三つへ増やします。
+現在のReact版は、旧`main.js`にあったメイン部屋から始まります。この手順書では、高校生の実装課題として次の機能を追加します。
 
-- `mezzo`: 緑色の部屋
-- `forte`: 赤・ピンク色の部屋
-- `piano`: 青色の部屋
+- メイン部屋のForteドアから`forte`部屋へ移動する
+- メイン部屋のMezzoドアから`mezzo`部屋へ移動する
+- メイン部屋のPianoドアから`piano`部屋へ移動する
+- 各サブ部屋のLargoドアからメイン部屋へ戻る
+- サブ部屋同士を、元から置かれていたドアで移動する
 
-プレイヤーが行き先の設定されたドアへ近づくと、Reactのstateを更新して別の部屋へ移動します。
+この機能はまだ実装されていません。コードを上から順番にコピーするだけでなく、各説明を読んで「どの値がどこを通るか」を確認しながら進めてください。
 
-この機能はまだコードへ実装されていません。以下の手順は、高校生がReactとThree.jsの関係を学びながら、自分で実装するためのものです。上から順番に進め、一つの手順が終わるたびに動作確認してください。
+## 現在の状態
+
+最初に表示されるメイン部屋は、すでにReact版へ復元されています。
+
+| 項目 | メイン部屋の設定 |
+| --- | --- |
+| 背景 | 灰色 `0xadadad` |
+| 床 | 灰色 `0x7d7d7d` |
+| カメラの視野角 | `65` |
+| 本 | 陽だまりのセツナ 1冊 |
+| テーブル | 非表示。旧`main.js`でもコメントアウトされていた |
+| 東側のドア | Forte |
+| 左手前のドア | Mezzo |
+| 左奥のドア | Piano |
+
+現在はドアへ近づいても部屋は変わりません。三つのサブ部屋もまだReact版へ追加されていません。
 
 ## 完成条件
 
-実装完了と判断する条件は次のとおりです。
+次を全て満たしたら完成です。
 
-- 最初は緑色の`mezzo`部屋が表示される
-- `Piano`のドアへ近づくと青色の`piano`部屋へ移動する
-- `Forte`のドアへ近づくと赤色の`forte`部屋へ移動する
-- 移動後、背景、床、本、ドアが移動先の設定へ変わる
-- 部屋を移動するたびに古いcanvasとイベントが片付けられる
-- 画面上にcanvasが二つ以上作られない
-- `Largo`のドアは、遷移先が未実装なので移動しない
-- 部屋を移動したあともWASD移動、本のFキー操作、モーダルが動く
+- 最初は灰色の`Main Room`が表示される
+- Forteドアから赤・ピンク色の`Forte Room`へ移動できる
+- Mezzoドアから緑色の`Mezzo Room`へ移動できる
+- Pianoドアから青色の`Piano Room`へ移動できる
+- 各サブ部屋のLargoドアから`Main Room`へ戻れる
+- 部屋ごとに背景、床、本、ドア、テーブルの有無が変わる
+- 部屋移動後もWASD移動と本のFキー操作が使える
+- 部屋を何度移動してもcanvasが一つだけである
 - `npm run lint`と`npm run build`が成功する
 
-## 実装前に理解すること
+## 実装の全体像
 
-### 部屋を切り替える考え方
-
-Three.jsのシーンを三つのファイルへコピーしてはいけません。背景色、本、ドアなどの「部屋ごとに違う値」だけを設定データへまとめ、描画処理は一つを再利用します。
+### ReactからThree.jsへ設定を渡す流れ
 
 ```text
 App.jsx
-└── currentRoomId = "mezzo"
-    ↓ roomConfigをpropsで渡す
+└── currentRoomId = "main"
+    ↓ rooms[currentRoomId]をpropsで渡す
 Experience.jsx
     ↓ Hookへ渡す
 useThreeScene.js
     ↓ Three.jsへ渡す
 createMeloriumScene.js
-└── roomConfigに合わせて背景・床・本・ドアを作る
+└── roomConfigから背景・床・本・ドアを作る
 ```
 
-ドアへ近づいたときは、この流れを反対方向へ進みます。
+### ドアからReactへ移動先を返す流れ
 
 ```text
-Three.jsがドアとの距離を測る
-    ↓ onChangeRoom("piano")
-App.jsxがcurrentRoomIdを"piano"へ変更
-    ↓ Reactが再描画
-useThreeSceneが古いシーンをdispose
+Three.jsがカメラとドアの距離を測る
+    ↓ onChangeRoom("mezzo")
+App.jsxがcurrentRoomIdを"mezzo"へ変更
+    ↓ propsが変わる
+useThreeSceneが古いシーンをcleanup
     ↓
-pianoのroomConfigで新しいシーンを作る
+mezzoの設定で新しいシーンを作る
 ```
 
-### なぜシーンを作り直すのか
+### なぜThree.jsファイルを4個作らないのか
 
-背景、本、ドアを一個ずつ差し替える方法もありますが、最初の実装としては管理が複雑です。この課題では、部屋が変わると古いシーンを丸ごと片付け、新しい設定から作り直します。
+旧版では`main.js`、`mezzo.js`、`forte.js`、`piano.js`に同じ処理が繰り返し書かれていました。その方法では、移動速度を直すだけでも複数ファイルを同じように修正する必要があります。
 
-現在の`useThreeScene.js`にはcleanup処理があるため、この方法を安全に使えます。また、Reactの「propsが変わるとEffectがやり直される」という仕組みを学べます。
+React版では、共通の描画処理を`createMeloriumScene.js`へ一度だけ書きます。部屋ごとに異なる色、画像、位置だけを`roomData.js`へまとめます。
 
-## 3部屋とドアの対応
+## 部屋とドアの対応
 
-旧JavaScript版にあった設定を使います。
+旧JavaScript版に置かれていたドアを、次の移動先として使います。
 
 | 現在の部屋 | ドア画像 | 移動先 |
 | --- | --- | --- |
+| main | `fdoorm.png` | forte |
+| main | `mdoorm.png` | mezzo |
+| main | `pdoorm.png` | piano |
 | mezzo | `pdoorm.png` | piano |
 | mezzo | `fdoorm.png` | forte |
-| mezzo | `ldoorm.png` | 未実装 |
+| mezzo | `ldoorm.png` | main |
 | forte | `mdoorm.png` | mezzo |
 | forte | `pdoorm.png` | piano |
-| forte | `ldoorm.png` | 未実装 |
+| forte | `ldoorm.png` | main |
 | piano | `fdoorm.png` | forte |
 | piano | `mdoorm.png` | mezzo |
-| piano | `ldoorm.png` | 未実装 |
+| piano | `ldoorm.png` | main |
 
-`ldoor`はLargo用と思われる素材ですが、対応する部屋のコードがありません。今回は`destinationRoomId: null`にし、近づいても移動しないドアとして残します。
+サブ部屋の`ldoorm.png`は、今回はメイン部屋へ戻るドアとして使います。
 
-## 手順0: 作業ブランチと現在の状態を確認する
+## 手順0: 作業前の状態を確認する
 
 ターミナルで次を実行します。
 
@@ -90,77 +108,60 @@ npm run lint
 npm run build
 ```
 
-作業開始前からエラーがある場合は、先に先生または担当者へ相談してください。既存エラーと自分が追加したエラーを混ぜないことが大切です。
+作業前からエラーがある場合は、先に先生または担当者へ相談してください。
 
-新しいブランチを作る場合は次のようにします。
+必要なら作業ブランチを作ります。
 
 ```bash
 git switch -c feature/room-transitions
 ```
 
-すでにこの名前のブランチがある場合は、別の名前にしてください。
+続いて`npm run dev`で現在の画面を開き、次を確認します。
 
-## 手順1: 三つの部屋で使う画像を登録する
+- 背景と床が灰色
+- 中央奥に陽だまりのセツナがある
+- Forte、Mezzo、Pianoの三つのドアがある
+- ドアへ近づいても、まだ移動しない
+
+この状態が実装前の基準です。
+
+## 手順1: Piano部屋で使う画像を登録する
 
 変更するファイル: `src/assets.js`
 
-現在登録されていない、赤・青の本と各部屋の表紙画像をimportします。既存のimportの下へ次を追加してください。
+main、mezzo、forteで必要な画像はすでに登録されています。Piano部屋で使う次の画像をimportへ追加します。
 
 ```js
-import redBackUrl from "../images/red-ura.jpg";
 import blueBackUrl from "../images/blue-ura.jpg";
-import hidamariCoverUrl from "../images/陽だまりのセツナ.png";
-import hidamariSpineUrl from "../images/陽だまりのセツナ1背.png";
 import decCoverUrl from "../images/Dec.png";
 import decSpineUrl from "../images/Dec1背.png";
 import sleepwalkCoverUrl from "../images/Sleepwalk.png";
 import sleepwalkSpineUrl from "../images/Sleepwalk3背.png";
-import mezzoDoorUrl from "../images/mdoorm.png";
 ```
 
-次に、`assets.textures`の中へ追加します。
+次に`assets.textures`へ追加します。
 
 ```js
-bookBackRed: redBackUrl,
-bookBackBlue: blueBackUrl,
-hidamariCover: hidamariCoverUrl,
-hidamariSpine: hidamariSpineUrl,
+pianoBookBack: blueBackUrl,
 decCover: decCoverUrl,
 decSpine: decSpineUrl,
 sleepwalkCover: sleepwalkCoverUrl,
 sleepwalkSpine: sleepwalkSpineUrl,
-mezzoDoor: mezzoDoorUrl,
 ```
-
-既存の`bookBack`はmezzo用なので、分かりやすくするため次の名前へ変更します。
-
-```js
-bookBackGreen: greenBackUrl,
-```
-
-この変更後は、現在の`assets.textures.bookBack`参照が一時的にエラーになります。手順3で修正するため、ここでは先へ進んで構いません。
 
 ### 確認ポイント
 
-- 同じ変数名を二回宣言していない
-- ファイル名の日本語や大文字・小文字が実際の画像と一致している
-- `textures`オブジェクトの各行末に`,`がある
+- importの変数名と`textures`内の名前を混同していない
+- 日本語ファイル名や大文字・小文字が実際のファイルと一致している
+- オブジェクトの各行末に`,`が付いている
 
-## 手順2: 各部屋の曲情報を追加する
+## 手順2: Piano部屋の曲データを追加する
 
 変更するファイル: `src/data/siteData.js`
 
-現在の`songs`にはmezzo部屋の二曲だけが登録されています。`songs`オブジェクトへ次の三曲を追加します。
+`hidamari`、`planetes`、`marySue`はすでに登録されています。`songs`オブジェクトへ次を追加します。
 
 ```js
-hidamari: {
-  id: "hidamari",
-  title: "陽だまりのセツナ",
-  artist: "正式なアーティスト名を入力",
-  description: "正式な曲紹介を入力",
-  youtubeUrl: "正式なYouTube URLを入力",
-  spotifyUrl: "正式なSpotify URLを入力",
-},
 dec: {
   id: "dec",
   title: "Dec",
@@ -179,18 +180,18 @@ sleepwalk: {
 },
 ```
 
-仮文字列のままでも画面は動きますが、公開前に正式な情報へ置き換えてください。URLが未確定の場合は、リンクを押せないようにする改善が別途必要です。
+仮文字列でも画面は動きますが、公開前に正式な情報へ置き換えてください。
 
-## 手順3: 部屋設定ファイルを作る
+## 手順3: 四つの部屋設定を作る
 
 新しく作るファイル: `src/data/roomData.js`
 
-次の内容をそのまま作成します。
+次の内容を作成します。
 
 ```js
 import { assets } from "../assets.js";
 
-// 三つのドアを置く場所は全ての部屋で共通です。
+// ドアの三つの設置場所は、全ての部屋で共通です。
 const doorPositions = {
   east: {
     position: [5.8, 1.95, 0],
@@ -206,13 +207,59 @@ const doorPositions = {
   },
 };
 
+// 旧main.jsと同じ高さへ本を置くための計算です。
+const mainBookHeight = 1.05 * (790 / 569);
+
 export const rooms = {
+  main: {
+    id: "main",
+    label: "Main Room",
+    cameraFov: 65,
+    backgroundColor: 0xadadad,
+    floorColor: 0x7d7d7d,
+    showTables: false,
+    bookBackTextureUrl: assets.textures.mainBookBack,
+    bookEdgeColor: 0x7a1f20,
+    books: [
+      {
+        songId: "hidamari",
+        coverTextureUrl: assets.textures.hidamariCover,
+        spineTextureUrl: assets.textures.hidamariSpine,
+        position: [0, mainBookHeight / 2 + 0.16, -2.6],
+        rotation: [0, 0, 0],
+        scale: 1,
+      },
+    ],
+    doors: [
+      {
+        name: "forte-door",
+        textureUrl: assets.textures.forteDoor,
+        destinationRoomId: "forte",
+        ...doorPositions.east,
+      },
+      {
+        name: "mezzo-door",
+        textureUrl: assets.textures.mezzoDoor,
+        destinationRoomId: "mezzo",
+        ...doorPositions.frontLeft,
+      },
+      {
+        name: "piano-door",
+        textureUrl: assets.textures.pianoDoor,
+        destinationRoomId: "piano",
+        ...doorPositions.backLeft,
+      },
+    ],
+  },
+
   mezzo: {
     id: "mezzo",
     label: "Mezzo Room",
+    cameraFov: 60,
     backgroundColor: 0xa2b3aa,
     floorColor: 0xa1eda1,
-    bookBackTextureUrl: assets.textures.bookBackGreen,
+    showTables: true,
+    bookBackTextureUrl: assets.textures.bookBack,
     bookEdgeColor: 0x1b2f23,
     books: [
       {
@@ -221,6 +268,7 @@ export const rooms = {
         spineTextureUrl: assets.textures.planetesSpine,
         position: [-1.5, 2, 1.5],
         rotation: [-Math.PI / 2, 0, -Math.PI / 4],
+        scale: 0.7,
       },
       {
         songId: "marySue",
@@ -228,6 +276,7 @@ export const rooms = {
         spineTextureUrl: assets.textures.marySueSpine,
         position: [1.5, 2, -1.5],
         rotation: [-Math.PI / 2, 0, (Math.PI * 3) / 4],
+        scale: 0.7,
       },
     ],
     doors: [
@@ -244,9 +293,9 @@ export const rooms = {
         ...doorPositions.frontLeft,
       },
       {
-        name: "largo-door",
+        name: "main-door",
         textureUrl: assets.textures.largoDoor,
-        destinationRoomId: null,
+        destinationRoomId: "main",
         ...doorPositions.backLeft,
       },
     ],
@@ -255,9 +304,11 @@ export const rooms = {
   forte: {
     id: "forte",
     label: "Forte Room",
+    cameraFov: 60,
     backgroundColor: 0xb3a2ac,
     floorColor: 0xc27a89,
-    bookBackTextureUrl: assets.textures.bookBackRed,
+    showTables: true,
+    bookBackTextureUrl: assets.textures.mainBookBack,
     bookEdgeColor: 0x59171e,
     books: [
       {
@@ -266,6 +317,7 @@ export const rooms = {
         spineTextureUrl: assets.textures.hidamariSpine,
         position: [-1.5, 2, 1.5],
         rotation: [-Math.PI / 2, 0, -Math.PI / 4],
+        scale: 0.7,
       },
     ],
     doors: [
@@ -282,9 +334,9 @@ export const rooms = {
         ...doorPositions.frontLeft,
       },
       {
-        name: "largo-door",
+        name: "main-door",
         textureUrl: assets.textures.largoDoor,
-        destinationRoomId: null,
+        destinationRoomId: "main",
         ...doorPositions.backLeft,
       },
     ],
@@ -293,9 +345,11 @@ export const rooms = {
   piano: {
     id: "piano",
     label: "Piano Room",
+    cameraFov: 60,
     backgroundColor: 0xa2b3b2,
     floorColor: 0xa1d8ed,
-    bookBackTextureUrl: assets.textures.bookBackBlue,
+    showTables: true,
+    bookBackTextureUrl: assets.textures.pianoBookBack,
     bookEdgeColor: 0x173046,
     books: [
       {
@@ -304,6 +358,7 @@ export const rooms = {
         spineTextureUrl: assets.textures.decSpine,
         position: [-1.5, 2, 1.5],
         rotation: [-Math.PI / 2, 0, -Math.PI / 4],
+        scale: 0.7,
       },
       {
         songId: "sleepwalk",
@@ -311,6 +366,7 @@ export const rooms = {
         spineTextureUrl: assets.textures.sleepwalkSpine,
         position: [1.5, 2, -1.5],
         rotation: [-Math.PI / 2, 0, (Math.PI * 3) / 4],
+        scale: 0.7,
       },
     ],
     doors: [
@@ -327,9 +383,9 @@ export const rooms = {
         ...doorPositions.frontLeft,
       },
       {
-        name: "largo-door",
+        name: "main-door",
         textureUrl: assets.textures.largoDoor,
-        destinationRoomId: null,
+        destinationRoomId: "main",
         ...doorPositions.backLeft,
       },
     ],
@@ -337,79 +393,44 @@ export const rooms = {
 };
 ```
 
-### このファイルで学ぶこと
+### この設定から学べること
 
-- 共通処理ではなく、違いだけをデータとして表現する
-- 配列を使って本やドアの数を表現する
-- `...doorPositions.east`という展開構文で共通の位置設定を再利用する
-- 16進数でThree.jsの色を表す
-- `null`を「移動先なし」という意味で使う
+- `main`を含む四部屋の違いを一つのオブジェクトで管理する
+- `showTables`で部屋ごとの表示有無を切り替える
+- `scale`でメイン部屋とサブ部屋の本の大きさを変える
+- `destinationRoomId`でドアと移動先を結び付ける
+- `...doorPositions.east`で共通の位置を再利用する
 
-### 確認ポイント
-
-ファイル末尾で`rooms.mezzo`などを一時的に`console.log()`する必要はありません。まず`npm run lint`を実行し、文法エラーがないことを確認してください。
-
-## 手順4: 本の縁の色を部屋ごとに変えられるようにする
-
-変更するファイル: `src/three/createBook.js`
-
-`createBook()`の引数へ`edgeColor`を追加します。
-
-```js
-export function createBook({
-  textureLoader,
-  renderer,
-  backTextureUrl,
-  coverTextureUrl,
-  spineTextureUrl,
-  position,
-  rotation,
-  songId,
-  edgeColor,
-}) {
-```
-
-次の固定色を探します。
-
-```js
-const coverEdgeMaterial = createSolidMaterial(0x1b2f23, 0.82);
-```
-
-`edgeColor`を使うように変更します。
-
-```js
-const coverEdgeMaterial = createSolidMaterial(edgeColor, 0.82);
-```
-
-これで、同じ本作成関数を使いながら、mezzoは緑、forteは赤、pianoは青の縁になります。
-
-## 手順5: Three.jsシーンがroomConfigを受け取れるようにする
+## 手順4: Three.jsシーンをroomConfig対応にする
 
 変更するファイル: `src/three/createMeloriumScene.js`
 
-### 5-1. 固定設定を削除する
+### 4-1. 現在の固定設定を削除する
 
-ファイル上部にある次の二つを削除します。
+次の固定値と配列を削除します。
 
-- `const doorSettings = [...]`
-- `const bookSettings = [...]`
+- `MAIN_BACKGROUND_COLOR`
+- `MAIN_FLOOR_COLOR`
+- `SHOW_TABLES`
+- `doorSettings`
+- `bookSettings`
 
-これらは手順3の`roomConfig.doors`と`roomConfig.books`へ移したためです。
+これらは全て`roomData.js`へ移動しました。
 
-### 5-2. ドアへ近づく距離を定数にする
+### 4-2. ドアの反応距離を追加する
 
 他の定数の下へ追加します。
 
 ```js
-// カメラとドアの中心がこの距離以下になったら部屋を移動します。
+// カメラとドアの中心がこの距離以下になったら移動します。
 const DOOR_TRIGGER_DISTANCE = 1.6;
 ```
 
-`1.6`は、ドアの当たり判定で押し戻される前に反応できるよう少し広めにしています。実際の見た目に合わない場合だけ、最後に調整してください。
+ドアの当たり判定に押し戻される前に反応できるよう、少し広めの値にしています。
 
-### 5-3. 床の色を引数で受け取る
+### 4-3. 床の色を引数へ変更する
 
-現在の関数を次の形へ変更します。
+`addFloor`を次の形へ変更します。
 
 ```js
 function addFloor(scene, floorColor) {
@@ -428,9 +449,7 @@ function addFloor(scene, floorColor) {
 }
 ```
 
-### 5-4. createMeloriumSceneの引数を増やす
-
-関数の引数へ`roomConfig`と`onChangeRoom`を追加します。
+### 4-4. 関数の引数を増やす
 
 ```js
 export function createMeloriumScene({
@@ -443,37 +462,42 @@ export function createMeloriumScene({
 }) {
 ```
 
-変数の宣言部分へ次を追加します。
+関数の先頭に次の変数を追加します。
 
 ```js
-// 一度移動を開始したあと、次のフレームで同じ処理を繰り返さないための印です。
+// 一度移動を始めたあと、次フレームで同じ処理を繰り返さないための印です。
 let isTransitioning = false;
 
-// 移動先が設定されたドアだけを保存します。
+// 移動に使うドア本体と移動先を保存します。
 const transitionDoors = [];
 
-// 距離計算のたびにVector3を作らず、同じものを使い回します。
+// 距離計算で同じVector3を再利用します。
 const doorWorldPosition = new THREE.Vector3();
 ```
 
-### 5-5. 背景と床へroomConfigを使う
-
-背景色を次のように変更します。
+### 4-5. 背景・カメラ・床へ設定を使う
 
 ```js
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(roomConfig.backgroundColor);
+
+const camera = new THREE.PerspectiveCamera(
+  roomConfig.cameraFov,
+  1,
+  0.1,
+  1000,
+);
 ```
 
-床を追加している場所を変更します。
+床を追加する場所も変更します。
 
 ```js
 addFloor(scene, roomConfig.floorColor);
 ```
 
-### 5-6. roomConfigから本を作る
+### 4-6. 設定から本を作る
 
-現在の`bookSettings.forEach(...)`を、次のコードへ置き換えます。
+現在の`bookSettings.forEach(...)`を置き換えます。
 
 ```js
 roomConfig.books.forEach((setting) => {
@@ -486,6 +510,7 @@ roomConfig.books.forEach((setting) => {
     position: new THREE.Vector3(...setting.position),
     rotation: new THREE.Euler(...setting.rotation),
     songId: setting.songId,
+    scale: setting.scale,
     edgeColor: roomConfig.bookEdgeColor,
   });
 
@@ -498,11 +523,11 @@ roomConfig.books.forEach((setting) => {
 });
 ```
 
-`roomData.js`では位置を普通の配列として保存しました。Three.jsで使う直前に`Vector3`と`Euler`へ変換しています。
+`createBook.js`はすでに`scale`と`edgeColor`を受け取れるため、この手順では変更不要です。
 
-### 5-7. roomConfigからドアを作る
+### 4-7. 設定からドアを作る
 
-ドアのGLB読み込み内にある`doorSettings.forEach(...)`を、次のコードへ置き換えます。
+ドアのGLB読み込み内にある`doorSettings.forEach(...)`を置き換えます。
 
 ```js
 roomConfig.doors.forEach((setting) => {
@@ -516,19 +541,40 @@ roomConfig.doors.forEach((setting) => {
   scene.add(door);
   collisions.add(door);
 
-  // nullではないドアだけが、別の部屋への入口になります。
-  if (setting.destinationRoomId) {
-    transitionDoors.push({
-      object: door,
-      destinationRoomId: setting.destinationRoomId,
-    });
-  }
+  transitionDoors.push({
+    object: door,
+    destinationRoomId: setting.destinationRoomId,
+  });
 });
 ```
 
-### 5-8. ドアとの距離を測る関数を追加する
+### 4-8. テーブル表示を設定で切り替える
 
-`renderFrame()`より前へ、次の関数を追加します。
+現在は次の形になっています。
+
+```js
+if (SHOW_TABLES) {
+  gltfLoader.load(
+    // 既存のテーブル読み込み処理
+  );
+}
+```
+
+これを変更します。
+
+```js
+if (roomConfig.showTables) {
+  gltfLoader.load(
+    // 既存のテーブル読み込み処理
+  );
+}
+```
+
+これにより、mainではテーブルを作らず、三つのサブ部屋では作ります。
+
+### 4-9. ドアとの距離を測る
+
+`renderFrame()`より前へ追加します。
 
 ```js
 const checkDoorTransition = () => {
@@ -536,17 +582,17 @@ const checkDoorTransition = () => {
   if (isPaused || isTransitioning || !controls.isLocked) return;
 
   for (const door of transitionDoors) {
-    // ドアのローカル座標ではなく、シーン全体での位置を取得します。
+    // ドアのシーン全体での位置を取得します。
     door.object.getWorldPosition(doorWorldPosition);
 
-    // 高さYは無視し、床と同じXZ平面上での距離を求めます。
+    // 高さYを無視し、床と同じXZ平面での距離を計算します。
     const distance = Math.hypot(
       camera.position.x - doorWorldPosition.x,
       camera.position.z - doorWorldPosition.z,
     );
 
     if (distance <= DOOR_TRIGGER_DISTANCE) {
-      // Reactの再描画までに同じ処理が連続しないよう、先にtrueにします。
+      // Reactのstate更新より先に印を付け、連続実行を防ぎます。
       isTransitioning = true;
       pressedKeys.clear();
       controls.unlock();
@@ -557,11 +603,9 @@ const checkDoorTransition = () => {
 };
 ```
 
-`for...of`を使う理由は、移動先を見つけたら`return`で関数全体を終了できるからです。
+### 4-10. 毎フレーム確認する
 
-### 5-9. 毎フレーム距離を確認する
-
-`renderFrame()`の中で、移動と当たり判定のあとに一行追加します。
+`renderFrame()`内の移動・当たり判定のあとへ追加します。
 
 ```js
 if (controls.isLocked && !isPaused) {
@@ -574,13 +618,11 @@ updateFocusedBook();
 renderer.render(scene, camera);
 ```
 
-当たり判定後の安全なカメラ位置を使って、ドアまでの距離を測ります。
-
-## 手順6: Experienceから部屋設定を渡す
+## 手順5: Experienceでpropsを中継する
 
 変更するファイル: `src/components/Experience.jsx`
 
-propsへ`roomConfig`と`onChangeRoom`を追加します。
+引数へ`roomConfig`と`onChangeRoom`を追加します。
 
 ```jsx
 export default function Experience({
@@ -593,7 +635,7 @@ export default function Experience({
 }) {
 ```
 
-`useThreeScene()`へ渡すオブジェクトにも追加します。
+`useThreeScene()`にも追加します。
 
 ```js
 useThreeScene({
@@ -607,9 +649,9 @@ useThreeScene({
 });
 ```
 
-`Experience`は値を中継するだけです。ここへ距離計算や部屋選択の処理を書かないでください。
+`Experience`は値を中継するだけです。ここへ距離計算を書かないでください。
 
-## 手順7: useThreeSceneからThree.jsへ渡す
+## 手順6: useThreeSceneでシーンを作り直す
 
 変更するファイル: `src/hooks/useThreeScene.js`
 
@@ -627,7 +669,7 @@ export default function useThreeScene({
 }) {
 ```
 
-`createMeloriumScene()`の呼び出しへ追加します。
+`createMeloriumScene()`へ渡します。
 
 ```js
 const sceneApi = createMeloriumScene({
@@ -640,7 +682,7 @@ const sceneApi = createMeloriumScene({
 });
 ```
 
-最初の`useEffect`の依存配列へ、`roomConfig`と`onChangeRoom`を追加します。
+最初の`useEffect`の依存配列へ追加します。
 
 ```js
 }, [
@@ -653,48 +695,38 @@ const sceneApi = createMeloriumScene({
 ]);
 ```
 
-ここが部屋切り替えの重要な部分です。`roomConfig`が変わると、Reactは次の順番で処理します。
+`roomConfig`が変わると、Reactは古いEffectのcleanupを実行してから、新しい設定でEffectを実行します。依存配列へ`roomConfig`を入れ忘れると、部屋名だけ変わって3D空間が変わりません。
 
-1. 前回のEffectが返したcleanupを実行する
-2. 古いThree.jsシーンを`dispose()`する
-3. 新しい`roomConfig`で`createMeloriumScene()`を呼ぶ
-
-依存配列から`roomConfig`を外すと、stateが変わっても3D空間が切り替わりません。
-
-## 手順8: Appで現在の部屋をstate管理する
+## 手順7: Appで現在の部屋を管理する
 
 変更するファイル: `src/App.jsx`
 
-### 8-1. 部屋データをimportする
+### 7-1. 部屋データをimportする
 
 ```js
 import { rooms } from "./data/roomData.js";
 ```
 
-### 8-2. 現在の部屋stateを追加する
-
-他の`useState`の近くへ追加します。
+### 7-2. stateを追加する
 
 ```js
-const [currentRoomId, setCurrentRoomId] = useState("mezzo");
+const [currentRoomId, setCurrentRoomId] = useState("main");
 const currentRoom = rooms[currentRoomId];
 ```
 
-最初の値が`"mezzo"`なので、ページを開いた直後は緑色の部屋になります。
+最初の値を必ず`"main"`にします。`"mezzo"`にすると、メイン部屋ではなく緑色の部屋から始まります。
 
-### 8-3. 部屋を変更する関数を追加する
-
-`handleSceneReady`の下へ追加します。
+### 7-3. 部屋変更関数を追加する
 
 ```js
 const handleChangeRoom = useCallback((nextRoomId) => {
-  // 設定にない文字列が渡されたときは、壊れた画面へ移動しません。
+  // 設定に無い部屋へ移動しないための安全確認です。
   if (!rooms[nextRoomId]) {
     console.error(`存在しない部屋です: ${nextRoomId}`);
     return;
   }
 
-  // 新しい部屋の素材を読み込むため、完了状態と画面上の選択を初期化します。
+  // 新しい部屋の読み込みに備え、画面上の状態を初期化します。
   setIsSceneReady(false);
   setSelectedSongId(null);
   setInteractionText("");
@@ -702,9 +734,9 @@ const handleChangeRoom = useCallback((nextRoomId) => {
 }, []);
 ```
 
-`useCallback`を使わず毎回新しい関数を作ると、`useThreeScene`の依存値が毎回変わり、関係のないstate更新でも3Dシーンを作り直す可能性があります。
+`useCallback`で関数を固定しないと、別のstate更新でもThree.jsシーンを作り直す可能性があります。
 
-### 8-4. Experienceへpropsを渡す
+### 7-4. Experienceへ渡す
 
 ```jsx
 <Experience
@@ -717,9 +749,7 @@ const handleChangeRoom = useCallback((nextRoomId) => {
 />
 ```
 
-### 8-5. 現在の部屋名を表示する
-
-タイトル付近へ部屋名を表示すると、テストしやすくなります。
+### 7-5. 現在の部屋名を表示する
 
 ```jsx
 <div>
@@ -728,23 +758,17 @@ const handleChangeRoom = useCallback((nextRoomId) => {
 </div>
 ```
 
-見た目は最後に`global.css`で調整します。最初は装飾されていなくても、文字が切り替われば成功です。
-
-## 手順9: 部屋ごとにローディング画面を作り直す
-
-変更するファイル: `src/App.jsx`
-
-現在の`LoadingScreen`へ`key`を追加します。
+### 7-6. ローディング画面を部屋ごとに作り直す
 
 ```jsx
 <LoadingScreen key={currentRoomId} isReady={isSceneReady} />
 ```
 
-Reactでは`key`が変わると、同じ種類のコンポーネントでも別のものとして作り直されます。これにより`LoadingScreen`内の`progress`と`isVisible`が初期値へ戻ります。
+`key`が変わると、Reactは`LoadingScreen`を新しいコンポーネントとして作り直します。これにより進捗が0%へ戻ります。
 
-このままでは、部屋を移動するたびに3秒ローディングが表示されます。これは既存の3秒仕様を優先した最初の実装です。部屋移動だけ短くしたい場合は、基本機能の完成後に別課題として調整してください。
+既存仕様を維持するため、部屋移動のたびに3秒ローディングが表示されます。短縮は基本機能完成後の発展課題にしてください。
 
-## 手順10: 部屋名のCSSを追加する
+## 手順8: 部屋名のCSSを追加する
 
 変更するファイル: `src/styles/global.css`
 
@@ -760,9 +784,9 @@ Reactでは`key`が変わると、同じ種類のコンポーネントでも別�
 }
 ```
 
-このCSSは機能に必須ではありません。部屋の切り替えを確認しやすくする補助表示です。
+部屋名は機能そのものには不要ですが、どの部屋にいるか確認しやすくなります。
 
-## 手順11: 静的検査をする
+## 手順9: 静的検査をする
 
 ```bash
 npm run lint
@@ -770,71 +794,75 @@ npm run build
 git diff --check
 ```
 
-エラーが出たら、最初のエラーから一つずつ直します。複数のエラーが同じカンマ抜けや変数名の間違いから発生している場合があります。
+エラーは表示された一番上から、一つずつ直してください。
 
-### よくあるLintエラー
+### `roomConfig is not defined`
 
-#### `roomConfig is not defined`
+`Experience`、`useThreeScene`、`createMeloriumScene`の引数を順番に確認します。
 
-関数の引数へ`roomConfig`を追加し忘れています。`Experience`、`useThreeScene`、`createMeloriumScene`の三箇所を順番に確認してください。
+### `onChangeRoom is not defined`
 
-#### `onChangeRoom is not defined`
+AppからThree.jsまで、同じ名前で関数を渡しているか確認します。
 
-同じくpropsまたは関数引数の中継漏れです。AppからThree.jsまで、同じ名前で渡してください。
+### `pianoBookBack is undefined`
 
-#### `bookBack is undefined`
+手順1のimportと`assets.textures`への追加を確認します。
 
-手順1で`bookBack`を`bookBackGreen`へ変更したあと、古い参照が残っています。検索してください。
+### `MAIN_BACKGROUND_COLOR is not defined`
+
+削除した固定値の参照が残っています。次で検索します。
 
 ```bash
-rg "bookBack" src
+rg "MAIN_BACKGROUND_COLOR|MAIN_FLOOR_COLOR|SHOW_TABLES|doorSettings|bookSettings" src
 ```
 
-## 手順12: ブラウザで動作確認する
+検索結果が、説明コメント以外に残っていない状態にします。
+
+## 手順10: ブラウザで動作確認する
 
 ```bash
 npm run dev
 ```
 
-表示されたURLをブラウザで開き、次の順番で確認します。
+### メイン部屋
 
-### 基本確認
+1. `Main Room`と表示される
+2. 背景と床が灰色
+3. 陽だまりのセツナが中央奥にある
+4. テーブルが表示されない
+5. WASDで移動できる
+6. 本へ照準を合わせ、Fキーでモーダルを開ける
 
-1. 最初に`Mezzo Room`と表示される
-2. 背景と床が緑色である
-3. プラネテスとメアリー・スーの憂鬱がある
-4. 画面をクリックしてWASDで移動できる
-5. 本へ照準を合わせ、Fキーでモーダルを開ける
+### Mainから各部屋
 
-### 部屋移動確認
+1. Forteドアへ近づき、赤・ピンク色の`Forte Room`へ移動する
+2. ページを再読み込みしてMainへ戻る
+3. Mezzoドアへ近づき、緑色の`Mezzo Room`へ移動する
+4. ページを再読み込みしてMainへ戻る
+5. Pianoドアへ近づき、青色の`Piano Room`へ移動する
 
-1. mezzoのPianoドアへ近づく
-2. ローディング画面が表示される
-3. `Piano Room`へ変わる
-4. 背景と床が青色になる
-5. DecとSleepwalkが表示される
-6. pianoのForteドアへ近づく
-7. `Forte Room`へ変わる
-8. 背景と床が赤・ピンク色になる
-9. 陽だまりのセツナが表示される
-10. forteのMezzoドアへ近づく
-11. 最初の`Mezzo Room`へ戻る
+### サブ部屋からMainへ戻る
 
-### 未実装ドア確認
+1. 各サブ部屋でLargoドアへ近づく
+2. 灰色の`Main Room`へ戻る
+3. Mainの三つのドアが再び表示される
 
-1. Largoドアへ近づく
-2. 部屋が切り替わらないことを確認する
-3. JavaScriptエラーが出ないことを確認する
+### 本の確認
 
-### cleanup確認
+- Main: 陽だまりのセツナ
+- Mezzo: プラネテス、メアリー・スーの憂鬱
+- Forte: 陽だまりのセツナ
+- Piano: Dec、Sleepwalk
 
-ブラウザの開発者ツールを開き、Consoleで次を実行します。
+### cleanupの確認
+
+ブラウザの開発者ツールのConsoleで実行します。
 
 ```js
 document.querySelectorAll("canvas").length
 ```
 
-何度部屋を移動しても`1`になれば、古いcanvasが正しく削除されています。`2`以上になる場合は、`useThreeScene`のcleanupと依存配列を確認してください。
+何度移動しても`1`なら成功です。`2`以上なら、`useThreeScene`のcleanupまたは依存配列を確認してください。
 
 ## うまく動かないとき
 
@@ -842,62 +870,63 @@ document.querySelectorAll("canvas").length
 
 次の順番で確認します。
 
-1. ドア設定の`destinationRoomId`が`null`ではないか
-2. `destinationRoomId`の文字列が`rooms`のキーと一致しているか
-3. `transitionDoors.push(...)`がGLB読み込み完了処理の中にあるか
-4. `checkDoorTransition()`を`renderFrame()`から呼んでいるか
-5. canvasをクリックし、Pointer Lock状態になっているか
-6. `DOOR_TRIGGER_DISTANCE`を一時的に`2.0`へ広げると反応するか
+1. `destinationRoomId`が`rooms`のキーと一致している
+2. `transitionDoors.push(...)`がドア読み込み処理の中にある
+3. `checkDoorTransition()`を毎フレーム呼んでいる
+4. canvasをクリックしてPointer Lock状態になっている
+5. `DOOR_TRIGGER_DISTANCE`を一時的に`2.0`へ変えると反応する
 
-### 一度の接近で何度も部屋が切り替わる
+### 一度の接近で何度も移動する
 
-`isTransitioning = true`を、`onChangeRoom()`より前に設定しているか確認します。Reactのstate更新は即座ではないため、先にローカルな印を付ける必要があります。
+`isTransitioning = true`を`onChangeRoom()`より前へ書いてください。Reactのstate更新は即座ではないため、先にThree.js側で連続実行を止めます。
 
-### 部屋名だけ変わって3D空間が変わらない
+### 部屋名だけ変わり3D空間が変わらない
 
-`useThreeScene`の最初の`useEffect`の依存配列に`roomConfig`があるか確認します。依存配列に無い場合、ReactはThree.jsシーンを作り直しません。
+`useThreeScene`の依存配列に`roomConfig`があるか確認します。
 
-### 部屋移動後にローディング画面が出ない
+### 移動後にローディングが表示されない
 
-`LoadingScreen`へ`key={currentRoomId}`が付いているか確認します。また、`handleChangeRoom`で`setIsSceneReady(false)`を呼んでください。
+次の二点を確認します。
 
-### 部屋移動後に画面が真っ暗になる
+- `handleChangeRoom`で`setIsSceneReady(false)`を呼ぶ
+- `LoadingScreen`へ`key={currentRoomId}`を付ける
 
-ブラウザのConsoleで最初のエラーを確認します。画像importの名前、`roomConfig.backgroundColor`、`roomConfig.books`、`roomConfig.doors`のタイプミスがないか調べてください。
+### 移動後にcanvasが増える
+
+`useThreeScene`のcleanupで`sceneApi.dispose()`を呼んでいるか確認します。`createMeloriumScene`の`dispose()`から、イベント解除と`renderer.domElement.remove()`を消してはいけません。
 
 ### ドアの前まで行けない
 
-現在のドアには当たり判定があります。まず`DOOR_TRIGGER_DISTANCE`を`1.8`へ変更して確認します。むやみに当たり判定を削除するとドアを通り抜けて床の端へ行けるため、最初は距離側を調整してください。
+ドアには当たり判定があります。最初は当たり判定を削除せず、`DOOR_TRIGGER_DISTANCE`を`1.8`へ広げて確認してください。
 
 ## 最終チェックリスト
 
-- [ ] `assets.js`へ全ての画像を登録した
-- [ ] `siteData.js`へ三曲を追加した
-- [ ] `roomData.js`へ三部屋を定義した
-- [ ] `createBook`が`edgeColor`を受け取る
-- [ ] `createMeloriumScene`が`roomConfig`と`onChangeRoom`を受け取る
-- [ ] ドアの距離判定にY座標を使っていない
-- [ ] `isTransitioning`で連続移動を防いでいる
-- [ ] `Experience`が二つの新しいpropsを中継している
+- [ ] Piano用の画像を`assets.js`へ追加した
+- [ ] DecとSleepwalkを`siteData.js`へ追加した
+- [ ] `roomData.js`にmainを含む四部屋がある
+- [ ] 初期stateが`"main"`になっている
+- [ ] Mainの三つのドアが正しい部屋へつながる
+- [ ] サブ部屋のLargoドアからMainへ戻れる
+- [ ] `roomConfig`がAppからThree.jsまで渡る
 - [ ] `useThreeScene`の依存配列に`roomConfig`がある
-- [ ] `App`が`currentRoomId`をstate管理している
-- [ ] `LoadingScreen`に`key={currentRoomId}`がある
-- [ ] Largoドアは移動しない
-- [ ] 部屋移動後も本をFキーで開ける
+- [ ] `isTransitioning`で連続移動を防いでいる
+- [ ] Mainではテーブルがなく、サブ部屋ではテーブルがある
+- [ ] 部屋ごとに本と色が変わる
+- [ ] 部屋移動後もFキーで本を開ける
 - [ ] canvasの数が常に一つ
 - [ ] `npm run lint`が成功する
 - [ ] `npm run build`が成功する
-- [ ] 実ブラウザで三部屋を往復した
+- [ ] 実ブラウザでMainから三部屋を往復した
 
 ## 発展課題
 
-基本実装が完成してから挑戦してください。
+基本機能が完成してから、一つずつ挑戦してください。
 
 1. ドアへ近づいたら即移動せず、「Fキーで入る」と表示する
-2. 移動前後に画面を暗くするトランジションを追加する
-3. 前の部屋へ戻ったとき、対応するドアの前から開始する
-4. Largo部屋を追加する
-5. URLへ現在の部屋を含め、再読み込み後も同じ部屋を表示する
-6. 部屋を移動するたびに3秒待たず、最初の一回だけ長いローディングを表示する
+2. 部屋移動前後に画面を暗くする
+3. 戻ったときに、移動元へ対応するドアの前から開始する
+4. URLへ現在の部屋IDを含める
+5. 部屋移動時だけローディング時間を短くする
+6. 訪れた部屋を記録し、メニューから移動できるようにする
 
-発展課題は一度に複数実装せず、一つ追加するたびにLint、build、ブラウザ確認を行ってください。
+一つ追加するたびに、Lint、build、ブラウザ確認を行ってください。

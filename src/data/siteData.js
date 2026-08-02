@@ -7,6 +7,16 @@
  * 公開前に、制作者が意図した正式な内容へ置き換えてください。
  */
 export const songs = {
+  hidamari: {
+    id: "hidamari",
+    title: "陽だまりのセツナ",
+    artist: "アーティスト情報は準備中です",
+    description:
+      "メインの部屋に展示されている一冊です。正式な曲紹介が決まったら、この文章を更新してください。",
+    youtubeUrl:
+      "https://www.youtube.com/results?search_query=陽だまりのセツナ",
+    spotifyUrl: "https://open.spotify.com/search/陽だまりのセツナ",
+  },
   planetes: {
     id: "planetes",
     title: "プラネテス",

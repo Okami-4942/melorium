@@ -400,6 +400,7 @@ export function createMeloriumScene({
     renderer.setSize(width, height, false);
   };
 
+
   const updateFocusedBook = () => {
     /*
      * 毎フレーム、画面中央の照準が本へ当たっているかを調べます。
@@ -420,13 +421,16 @@ export function createMeloriumScene({
       }
     }
 
-    /*
-     * 同じ本を見続けている間は値を更新しません。
-     * この変化をReactへ通知して案内文を表示する処理は、高校生向けの実装課題として残しています。
-     */
     if (focusedSongId === nextSongId) return;
     focusedSongId = nextSongId;
   };
+
+  /*
+     * 同じ本を見続けている間は値を更新しません。
+     * この変化をReactへ通知して案内文を表示する処理は、高校生向けの実装課題として残しています。
+     */
+  if (focusedSongId === nextSongId) return;
+  focusedSongId = nextSongId;
 
   /*
  * 本が見つかったときは案内文、見失ったときは空文字を送ります。

@@ -423,20 +423,8 @@ export function createMeloriumScene({
 
     if (focusedSongId === nextSongId) return;
     focusedSongId = nextSongId;
+    onInteractionChange(nextSongId ? "Fキーで開く" : "");
   };
-
-  /*
-     * 同じ本を見続けている間は値を更新しません。
-     * この変化をReactへ通知して案内文を表示する処理は、高校生向けの実装課題として残しています。
-     */
-  if (focusedSongId === nextSongId) return;
-  focusedSongId = nextSongId;
-
-  /*
- * 本が見つかったときは案内文、見失ったときは空文字を送ります。
- * 毎フレームではなく値が変化したときだけ送るため、不要な再描画を防げます。
- */
-  onInteractionChange(nextSongId ? "Fキーで開く" : "");
 
   const renderFrame = () => {
     // 次のブラウザ描画タイミングでも同じ関数を呼び、アニメーションループを作ります。

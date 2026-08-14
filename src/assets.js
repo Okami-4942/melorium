@@ -22,6 +22,11 @@ import largoDoorUrl from "../images/ldoorm.png";
 import loadingNoteUrl from "../images/lloading.svg";
 import linkButtonUrl from "../images/link-button.svg";
 import menuButtonUrl from "../images/menu-button.svg";
+import blueBackUrl from "../images/blue-ura.jpg";
+import decCoverUrl from "../images/Dec.png";
+import decSpineUrl from "../images/Dec1背.png";
+import sleepwalkCoverUrl from "../images/Sleepwalk.png";
+import sleepwalkSpineUrl from "../images/Sleepwalk3背.png";
 
 // 用途別のオブジェクトにまとめることで、利用側がassets.models.doorのように読めます。
 export const assets = {
@@ -42,6 +47,11 @@ export const assets = {
     forteDoor: forteDoorUrl,
     mezzoDoor: mezzoDoorUrl,
     largoDoor: largoDoorUrl,
+    pianoBookBack: blueBackUrl,
+    decCover: decCoverUrl,
+    decSpine: decSpineUrl,
+    sleepwalkCover: sleepwalkCoverUrl,
+    sleepwalkSpine: sleepwalkSpineUrl,
   },
   ui: {
     loadingNote: loadingNoteUrl,

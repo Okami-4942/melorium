@@ -4,6 +4,7 @@ import LoadingScreen from "./components/LoadingScreen.jsx";
 import MenuModal from "./components/MenuModal.jsx";
 import SongModal from "./components/SongModal.jsx";
 import { songs } from "./data/siteData.js";
+import { rooms } from "./data/roomData.js";
 
 export default function App() {
   /*
@@ -18,11 +19,15 @@ export default function App() {
   // nullは「曲を選んでいない」、文字列は「そのIDの曲を選んでいる」という意味です。
   const [selectedSongId, setSelectedSongId] = useState(null);
 
-// falseなら閉じている、trueなら開いている状態です。
+  // falseなら閉じている、trueなら開いている状態です。
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-   // 空文字なら非表示、文章があれば照準の下へ表示します。
+  // 空文字なら非表示、文章があれば照準の下へ表示します。
   const [interactionText, setInteractionText] = useState("");
+
+  const [currentRoomId, setCurrentRoomId] = useState("main");
+  const currentRoom = rooms[currentRoomId];
+
 
   // Hookのシーン再作成を防ぐため、同じ関数を再利用します。
   const handleSceneReady = useCallback(() => setIsSceneReady(true), []);
@@ -33,19 +38,38 @@ export default function App() {
   // 曲画面かメニューのどちらかが開いていれば、背後の3D操作を止めます。
   const isOverlayOpen = Boolean(selectedSong) || isMenuOpen;
 
+  const handleChangeRoom = useCallback((nextRoomId) => {
+    // 設定に無い部屋へ移動しないための安全確認です。
+    if (!rooms[nextRoomId]) {
+      console.error(`存在しない部屋です: ${nextRoomId}`);
+      return;
+    }
+
+    // 新しい部屋の読み込みに備え、画面上の状態を初期化します。
+    setIsSceneReady(false);
+    setSelectedSongId(null);
+    setInteractionText("");
+    setCurrentRoomId(nextRoomId);
+  }, []);
+
   return (
     <main className="app">
       {/* UI課題を実装するまでは3D操作を一時停止しないため、falseを渡します。 */}
       <Experience
+        roomConfig={currentRoom}
         isPaused={isOverlayOpen}
         onReady={handleSceneReady}
         // setState関数を渡すと、Three.jsから届いた曲IDをそのまま保存できます。
         onSelectSong={setSelectedSongId}
         onInteractionChange={setInteractionText}
+        onChangeRoom={handleChangeRoom}
       />
 
       <header className="site-header">
-        <p className="site-title">Melorium</p>
+        <div>
+          <p className="site-title">Melorium</p>
+          <p className="room-name">{currentRoom.label}</p>
+        </div>
         <button
           className="menu-trigger"
           type="button"
@@ -72,7 +96,7 @@ export default function App() {
       )}
 
       {/* 読み込み完了までは、3D画面の手前にローディング画面を表示します。 */}
-      <LoadingScreen isReady={isSceneReady} />
+      <LoadingScreen key={currentRoomId} isReady={isSceneReady} />
       <SongModal
         song={selectedSong}
         // nullへ戻すとsongもnullになり、条件付き表示によって閉じます。

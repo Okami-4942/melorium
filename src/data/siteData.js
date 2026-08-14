@@ -36,6 +36,22 @@ export const songs = {
       "https://www.youtube.com/results?search_query=メアリー・スーの憂鬱",
     spotifyUrl: "https://open.spotify.com/search/メアリー・スーの憂鬱",
   },
+  dec: {
+  id: "dec",
+  title: "Dec",
+  artist: "正式なアーティスト名を入力",
+  description: "正式な曲紹介を入力",
+  youtubeUrl: "正式なYouTube URLを入力",
+  spotifyUrl: "正式なSpotify URLを入力",
+},
+sleepwalk: {
+  id: "sleepwalk",
+  title: "Sleepwalk",
+  artist: "正式なアーティスト名を入力",
+  description: "正式な曲紹介を入力",
+  youtubeUrl: "正式なYouTube URLを入力",
+  spotifyUrl: "正式なSpotify URLを入力",
+},
 };
 
 // UI課題で作るMenuModalは、この配列をmap()して要素の数だけリンクを表示します。

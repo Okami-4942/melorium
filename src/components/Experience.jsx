@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import useThreeScene from "../hooks/useThreeScene.js";
 
-export default function Experience({ isPaused, onReady, onSelectSong, onInteractionChange, }) {
+export default function Experience({ roomConfig,isPaused, onReady, onSelectSong, onInteractionChange,onChangeRoom, }) {
   /*
    * ExperienceはReact側に「Three.jsを表示する場所」を用意するコンポーネントです。
    * Three.jsの具体的な処理をここへ直接書かず、useThreeSceneへ任せています。
@@ -17,10 +17,12 @@ export default function Experience({ isPaused, onReady, onSelectSong, onInteract
   // 親から受け取ったpropsをHookへそのまま渡し、ReactとThree.jsを接続します。
   useThreeScene({
     containerRef: sceneContainerRef,
+    roomConfig,
     isPaused,
     onReady,
     onSelectSong,
     onInteractionChange,
+    onChangeRoom,
   });
 
   return (

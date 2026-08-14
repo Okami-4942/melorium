@@ -416,6 +416,17 @@ a:focus-visible {
   pointer-events: none;
 }
 
+.room-name {
+  margin: 6px 0 0;
+  color: rgb(247 243 233 / 80%);
+  font-family: system-ui, sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 14px rgb(27 42 35 / 35%);
+}
+
+
 @media (prefers-reduced-motion: reduce) {
 
   /* OSで「視差効果を減らす」を選んだ利用者には、CSSアニメーションをほぼ無効化します。 */

@@ -16,59 +16,74 @@ const ROOM_RADIUS = 6.2;
 const PLAYER_HEIGHT = 2.6;
 const WALK_SPEED = 2.4;
 const INTERACTION_DISTANCE = 3;
-const MAIN_BACKGROUND_COLOR = 0xadadad;
-const MAIN_FLOOR_COLOR = 0x7d7d7d;
+// const MAIN_BACKGROUND_COLOR = 0xadadad;
+// const MAIN_FLOOR_COLOR = 0x7d7d7d;
 
 // 旧main.jsではテーブルがコメントアウトされていたため、初期部屋では読み込みません。
-const SHOW_TABLES = false;
+// const SHOW_TABLES = false;
+
+// カメラとドアの中心がこの距離以下になったら移動します。
+const DOOR_TRIGGER_DISTANCE = 1.6;
 
 /*
  * 旧main.jsにあったForte・Mezzo・Pianoの三つのドアを再現します。
  * 同じドアモデルを三回読み込む代わりに、違う値だけを配列へまとめます。
  * positionは[x, y, z]、rotationYはY軸まわりの回転角度（ラジアン）です。
  */
-const doorSettings = [
-  {
-    name: "forte-door",
-    textureUrl: assets.textures.forteDoor,
-    position: [5.8, 1.95, 0],
-    rotationY: Math.PI,
-  },
-  {
-    name: "mezzo-door",
-    textureUrl: assets.textures.mezzoDoor,
-    position: [-2.9, 1.95, 5.023],
-    rotationY: Math.PI / 3,
-  },
-  {
-    name: "piano-door",
-    textureUrl: assets.textures.pianoDoor,
-    position: [-2.9, 1.95, -5.023],
-    rotationY: -Math.PI / 3,
-  },
-];
+// const doorSettings = [
+//   {
+//     name: "forte-door",
+//     textureUrl: assets.textures.forteDoor,
+//     position: [5.8, 1.95, 0],
+//     rotationY: Math.PI,
+//   },
+//   {
+//     name: "mezzo-door",
+//     textureUrl: assets.textures.mezzoDoor,
+//     position: [-2.9, 1.95, 5.023],
+//     rotationY: Math.PI / 3,
+//   },
+//   {
+//     name: "piano-door",
+//     textureUrl: assets.textures.pianoDoor,
+//     position: [-2.9, 1.95, -5.023],
+//     rotationY: -Math.PI / 3,
+//   },
+// ];
 
 /*
  * 旧main.jsでは「陽だまりのセツナ」が中央奥に一冊置かれていました。
  * scaleとedgeColorも設定へ含め、当時の大きさと赤い表紙の縁を再現します。
  */
-const bookSettings = [
-  {
-    songId: "hidamari",
-    backTextureUrl: assets.textures.mainBookBack,
-    coverTextureUrl: assets.textures.hidamariCover,
-    spineTextureUrl: assets.textures.hidamariSpine,
-    position: new THREE.Vector3(0, (1.05 * (790 / 569)) / 2 + 0.16, -2.6),
-    rotation: new THREE.Euler(0, 0, 0),
-    scale: 1,
-    edgeColor: 0x7a1f20,
-  },
-];
+// const bookSettings = [
+//   {
+//     songId: "hidamari",
+//     backTextureUrl: assets.textures.mainBookBack,
+//     coverTextureUrl: assets.textures.hidamariCover,
+//     spineTextureUrl: assets.textures.hidamariSpine,
+//     position: new THREE.Vector3(0, (1.05 * (790 / 569)) / 2 + 0.16, -2.6),
+//     rotation: new THREE.Euler(0, 0, 0),
+//     scale: 1,
+//     edgeColor: 0x7a1f20,
+//   },
+// ];
 
 /*
  * Three.jsのGeometry・Material・TextureはGPU側にもデータを持ちます。
  * JavaScriptの変数を消すだけではGPUメモリが解放されないため、明示的にdispose()します。
  */
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(roomConfig.backgroundColor);
+
+const camera = new THREE.PerspectiveCamera(
+  roomConfig.cameraFov,
+  1,
+  0.1,
+  1000,
+);
+
+
 function disposeObject(object) {
   object.traverse((child) => {
     child.geometry?.dispose();
@@ -142,27 +157,41 @@ function addLights(scene) {
 }
 
 // 円柱の上面を床として使います。CylinderGeometryの高さ0.3が床の厚みです。
-function addFloor(scene) {
+function addFloor(scene, floorColor) {
   const floor = new THREE.Mesh(
     new THREE.CylinderGeometry(ROOM_RADIUS, ROOM_RADIUS, 0.3, 64),
     new THREE.MeshStandardMaterial({
-      color: MAIN_FLOOR_COLOR,
+      color: floorColor,
       roughness: 1,
       metalness: 0,
     }),
   );
+
   floor.position.y = 0.009;
   floor.receiveShadow = true;
   scene.add(floor);
 }
 
+// 一度移動を始めたあと、次フレームで同じ処理を繰り返さないための印です。
+let isTransitioning = false;
+
+// 移動に使うドア本体と移動先を保存します。
+const transitionDoors = [];
+
+// 距離計算で同じVector3を再利用します。
+const doorWorldPosition = new THREE.Vector3();
+
+
+
 export function createMeloriumScene({
   container,
+  roomConfig,
   onReady,
   // Fキーで選んだ曲IDをReactへ伝えるため、関数を受け取ります。
   onSelectSong,
   // 本へ照準が合った・外れた変化をReactへ伝える関数です。
   onInteractionChange,
+  onChangeRoom,
 }) {
   /*
    * Reactから受け取る値:
@@ -212,8 +241,8 @@ export function createMeloriumScene({
   };
 
   // Sceneは全3Dオブジェクトを入れる舞台です。背景色は旧main.jsの灰色を引き継いでいます。
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(MAIN_BACKGROUND_COLOR);
+  ne = new THREE.Scene();
+  const scescene, background = new THREE.Color(MAIN_BACKGROUND_COLOR);
 
   /*
    * PerspectiveCameraの引数は「視野角・縦横比・手前の描画距離・奥の描画距離」です。
@@ -252,26 +281,35 @@ export function createMeloriumScene({
   const movement = new THREE.Vector3();
 
   // 基本となる静的な床とライトを先にシーンへ追加します。
-  addFloor(scene);
+  addFloor(scene, roomConfig.floorColor);
   addLights(scene);
 
   /*
    * 本の違いはbookSettingsへまとめています。
    * 展開構文...settingで、その本の設定をcreateBookの引数へ追加しています。
    */
-  bookSettings.forEach((setting) => {
+  roomConfig.books.forEach((setting) => {
     const book = createBook({
       textureLoader,
       renderer,
-      ...setting,
+      backTextureUrl: roomConfig.bookBackTextureUrl,
+      coverTextureUrl: setting.coverTextureUrl,
+      spineTextureUrl: setting.spineTextureUrl,
+      position: new THREE.Vector3(...setting.position),
+      rotation: new THREE.Euler(...setting.rotation),
+      songId: setting.songId,
+      scale: setting.scale,
+      edgeColor: roomConfig.bookEdgeColor,
     });
+
     scene.add(book);
     collisions.add(book);
-    // traverseで本の子孫を全て調べ、Meshだけを照準判定の対象へ登録します。
+
     book.traverse((child) => {
       if (child.isMesh) interactableMeshes.push(child);
     });
   });
+
 
   /*
    * GLB内の各Meshへ指定画像を貼る関数です。
@@ -312,23 +350,30 @@ export function createMeloriumScene({
         return;
       }
 
-      doorSettings.forEach((setting) => {
+      roomConfig.doors.forEach((setting) => {
         const door = gltf.scene.clone(true);
         door.name = setting.name;
         door.scale.setScalar(0.5);
         door.position.fromArray(setting.position);
         door.rotation.y = setting.rotationY;
         applyDoorTexture(door, setting.textureUrl);
+
         scene.add(door);
         collisions.add(door);
+
+        transitionDoors.push({
+          object: door,
+          destinationRoomId: setting.destinationRoomId,
+        });
       });
+
     },
     undefined,
     (error) => console.error("ドアモデルを読み込めませんでした。", error),
   );
 
   // サブ部屋用のテーブル生成処理は残し、旧main.jsと同じ初期表示では実行しません。
-  if (SHOW_TABLES) {
+  if (roomConfig.showTables) {
     gltfLoader.load(
       assets.models.table,
       (gltf) => {
@@ -426,6 +471,32 @@ export function createMeloriumScene({
     onInteractionChange(nextSongId ? "Fキーで開く" : "");
   };
 
+  const checkDoorTransition = () => {
+  // モーダル中、移動開始後、Pointer Lock前は判定しません。
+  if (isPaused || isTransitioning || !controls.isLocked) return;
+
+  for (const door of transitionDoors) {
+    // ドアのシーン全体での位置を取得します。
+    door.object.getWorldPosition(doorWorldPosition);
+
+    // 高さYを無視し、床と同じXZ平面での距離を計算します。
+    const distance = Math.hypot(
+      camera.position.x - doorWorldPosition.x,
+      camera.position.z - doorWorldPosition.z,
+    );
+
+    if (distance <= DOOR_TRIGGER_DISTANCE) {
+      // Reactのstate更新より先に印を付け、連続実行を防ぎます。
+      isTransitioning = true;
+      pressedKeys.clear();
+      controls.unlock();
+      onChangeRoom(door.destinationRoomId);
+      return;
+    }
+  }
+};
+
+
   const renderFrame = () => {
     // 次のブラウザ描画タイミングでも同じ関数を呼び、アニメーションループを作ります。
     animationFrameId = requestAnimationFrame(renderFrame);
@@ -457,6 +528,7 @@ export function createMeloriumScene({
     }
 
     // 照準判定を更新したあと、現在のSceneをカメラから見た画像としてcanvasへ描きます。
+    checkDoorTransition();
     updateFocusedBook();
     renderer.render(scene, camera);
   };

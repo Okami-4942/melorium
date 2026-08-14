@@ -3,10 +3,12 @@ import { createMeloriumScene } from "../three/createMeloriumScene.js";
 
 export default function useThreeScene({
   containerRef,
+  roomConfig,
   isPaused,
   onReady,
   onSelectSong,
   onInteractionChange,
+  onChangeRoom,
 }) {
   /*
    * このカスタムHookは、ReactのライフサイクルとThree.jsのライフサイクルをつなぎます。
@@ -27,9 +29,11 @@ export default function useThreeScene({
     // ReactからThree.jsへはDOMとコールバックだけを渡します。Three.js側はReactのstateを直接変更しません。
     const sceneApi = createMeloriumScene({
       container: containerRef.current,
+      roomConfig,
       onReady,
       onSelectSong,
       onInteractionChange,
+      onChangeRoom,
     });
     sceneApiRef.current = sceneApi;
 
@@ -41,7 +45,7 @@ export default function useThreeScene({
       sceneApi.dispose();
       sceneApiRef.current = null;
     };
-  }, [containerRef, onInteractionChange,onReady,onSelectSong,]);
+  }, [containerRef,roomConfig,onInteractionChange,onReady,onSelectSong,onChangeRoom,]);
 
   useEffect(() => {
     /*

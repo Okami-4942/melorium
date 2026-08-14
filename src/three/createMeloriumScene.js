@@ -240,19 +240,6 @@ export function createMeloriumScene({
     });
   };
 
-  // Sceneは全3Dオブジェクトを入れる舞台です。背景色は旧main.jsの灰色を引き継いでいます。
-  ne = new THREE.Scene();
-  const scene, background = new THREE.Color(MAIN_BACKGROUND_COLOR);
-
-  /*
-   * PerspectiveCameraの引数は「視野角・縦横比・手前の描画距離・奥の描画距離」です。
-   * 縦横比は直後のresize()で実際の画面サイズへ更新します。
-   */
-  const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 1000);
-  camera.position.set(0, PLAYER_HEIGHT, 0);
-  addCrosshair(camera);
-  scene.add(camera);
-
   // WebGLRendererがThree.jsのSceneをcanvasへ描画します。
   const renderer = new THREE.WebGLRenderer({
     antialias: true,

@@ -242,7 +242,7 @@ export function createMeloriumScene({
 
   // Sceneは全3Dオブジェクトを入れる舞台です。背景色は旧main.jsの灰色を引き継いでいます。
   ne = new THREE.Scene();
-  const scescene, background = new THREE.Color(MAIN_BACKGROUND_COLOR);
+  const scene, background = new THREE.Color(MAIN_BACKGROUND_COLOR);
 
   /*
    * PerspectiveCameraの引数は「視野角・縦横比・手前の描画距離・奥の描画距離」です。

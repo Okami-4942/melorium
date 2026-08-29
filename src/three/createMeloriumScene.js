@@ -199,6 +199,16 @@ export function createMeloriumScene({
    * - onReady: 全素材を読み終えたことをReactへ伝える関数
    */
 
+ const scene = new THREE.Scene();
+scene.background = new THREE.Color(roomConfig.backgroundColor);
+
+const camera = new THREE.PerspectiveCamera(
+  roomConfig.cameraFov,
+  1,
+  0.1,
+  1000,
+);
+
   // dispose後に遅れて読み込みが完了しても、古いシーンへ追加しないための印です。
   let isDisposed = false;
 

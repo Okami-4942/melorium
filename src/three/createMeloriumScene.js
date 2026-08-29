@@ -73,16 +73,6 @@ const DOOR_TRIGGER_DISTANCE = 1.6;
  * JavaScriptの変数を消すだけではGPUメモリが解放されないため、明示的にdispose()します。
  */
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(roomConfig.backgroundColor);
-
-const camera = new THREE.PerspectiveCamera(
-  roomConfig.cameraFov,
-  1,
-  0.1,
-  1000,
-);
-
 
 function disposeObject(object) {
   object.traverse((child) => {

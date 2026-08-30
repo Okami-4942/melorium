@@ -22,7 +22,7 @@ export const songs = {
     title: "プラネテス",
     artist: "seiza feat. 初音ミク",
     description:
-      "夜空に浮かぶ星のような音を、本の表紙と一緒にゆっくり味わってみてください。",
+      "宇宙の浮遊感と切なさの中に、大切な人と生きる強い想いを描く曲。",
     youtubeUrl: "https://youtu.be/UPztJYCAnO4?si=d1d7j1ae4NnYKf2M",
     spotifyUrl: "https://open.spotify.com/intl-ja/track/1juR8DDDsEBhTPkMcggme2?si=92120924745c4306",
   },
@@ -31,26 +31,26 @@ export const songs = {
     title: "メアリー・スーの憂鬱",
     artist: "鳥籠の中で僕たちは、 feat.むト",
     description:
-      "物語の中へ入り込むような一曲です。3D空間で本を眺めてから音楽を聴いてみましょう。",
+      "理想と現実の狭間で揺れる、自己愛と孤独を描いた退廃的な楽曲。",
     youtubeUrl:
-      "https://www.youtube.com/results?search_query=メアリー・スーの憂鬱",
+      "https://youtu.be/gYjTxnVRojk?si=guUxDnwfkZ2qbeI2",
     spotifyUrl: "https://open.spotify.com/intl-ja/track/2dw7cXNh8cxRc0gxJOcF4K?si=00591b5b38e34069",
   },
   dec: {
   id: "dec",
   title: "Dec",
-  artist: "正式なアーティスト名を入力",
-  description: "正式な曲紹介を入力",
-  youtubeUrl: "正式なYouTube URLを入力",
-  spotifyUrl: "正式なSpotify URLを入力",
+  artist: "kanaria",
+  description: "疾走感のあるサウンドに、切ない恋と自己犠牲的な想いを重ねた楽曲。",
+  youtubeUrl: "https://youtu.be/9xbT8OZcDJQ?si=W2VrpYv3CFY72zBJ",
+  spotifyUrl: "https://open.spotify.com/intl-ja/track/44PT3ussI7vcQb6QYJhLF8?si=e027ef64c8ef4a2a",
 },
 sleepwalk: {
   id: "sleepwalk",
   title: "Sleepwalk",
-  artist: "正式なアーティスト名を入力",
-  description: "正式な曲紹介を入力",
-  youtubeUrl: "正式なYouTube URLを入力",
-  spotifyUrl: "正式なSpotify URLを入力",
+  artist: "なとり",
+  description: "踊れる心地よさの裏に、不安や違和感が潜む夜のような楽曲。",
+  youtubeUrl: "https://youtu.be/l0vUtRwObp4?si=GFl52qChD0Dn62Hr",
+  spotifyUrl: "https://open.spotify.com/intl-ja/track/5WHq3vcWRRb9xeQKgv7lAi?si=839f1d1222a741c6",
 },
 };
 

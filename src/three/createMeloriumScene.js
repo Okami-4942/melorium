@@ -25,53 +25,7 @@ const INTERACTION_DISTANCE = 3;
 // カメラとドアの中心がこの距離以下になったら移動します。
 const DOOR_TRIGGER_DISTANCE = 1.6;
 
-/*
- * 旧main.jsにあったForte・Mezzo・Pianoの三つのドアを再現します。
- * 同じドアモデルを三回読み込む代わりに、違う値だけを配列へまとめます。
- * positionは[x, y, z]、rotationYはY軸まわりの回転角度（ラジアン）です。
- */
-// const doorSettings = [
-//   {
-//     name: "forte-door",
-//     textureUrl: assets.textures.forteDoor,
-//     position: [5.8, 1.95, 0],
-//     rotationY: Math.PI,
-//   },
-//   {
-//     name: "mezzo-door",
-//     textureUrl: assets.textures.mezzoDoor,
-//     position: [-2.9, 1.95, 5.023],
-//     rotationY: Math.PI / 3,
-//   },
-//   {
-//     name: "piano-door",
-//     textureUrl: assets.textures.pianoDoor,
-//     position: [-2.9, 1.95, -5.023],
-//     rotationY: -Math.PI / 3,
-//   },
-// ];
 
-/*
- * 旧main.jsでは「陽だまりのセツナ」が中央奥に一冊置かれていました。
- * scaleとedgeColorも設定へ含め、当時の大きさと赤い表紙の縁を再現します。
- */
-// const bookSettings = [
-//   {
-//     songId: "hidamari",
-//     backTextureUrl: assets.textures.mainBookBack,
-//     coverTextureUrl: assets.textures.hidamariCover,
-//     spineTextureUrl: assets.textures.hidamariSpine,
-//     position: new THREE.Vector3(0, (1.05 * (790 / 569)) / 2 + 0.16, -2.6),
-//     rotation: new THREE.Euler(0, 0, 0),
-//     scale: 1,
-//     edgeColor: 0x7a1f20,
-//   },
-// ];
-
-/*
- * Three.jsのGeometry・Material・TextureはGPU側にもデータを持ちます。
- * JavaScriptの変数を消すだけではGPUメモリが解放されないため、明示的にdispose()します。
- */
 
 
 function disposeObject(object) {

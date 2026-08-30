@@ -175,7 +175,7 @@ a:focus-visible {
   height: 420px;
   padding: 55px 65px;
   border-radius: 48px;
-  background: #eed1d2;
+  background:#f3f0e7;
   color: #2b2320;
 }
 
@@ -190,7 +190,7 @@ a:focus-visible {
   right: 25px;
   padding: 0;
   border: 0;
-  color: #b98c8f;
+  color: #b99a57;
   background: none;
   font-family: system-ui, sans-serif;
   font-size: 40px;
@@ -244,7 +244,7 @@ a:focus-visible {
 }
 
 .song-button-area a:hover {
-  color: #b98c8f;
+  color: #898989;
 }
 
 @media (max-width: 640px) {

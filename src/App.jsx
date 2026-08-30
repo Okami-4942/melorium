@@ -81,7 +81,7 @@ export default function App() {
       </header>
 
       <div className="controls-guide" aria-label="操作方法">
-        <span>クリック：視点操作</span>
+        <span>マウス：視点操作</span>
         <span>W A S D：移動</span>
       </div>
 

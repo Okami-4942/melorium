@@ -199,6 +199,10 @@ const camera = new THREE.PerspectiveCamera(
   1000,
 );
 
+camera.position.set(0, PLAYER_HEIGHT, 0);
+  addCrosshair(camera);
+  scene.add(camera);
+
   // dispose後に遅れて読み込みが完了しても、古いシーンへ追加しないための印です。
   let isDisposed = false;
 

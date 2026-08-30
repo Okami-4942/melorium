@@ -12,10 +12,10 @@ export const songs = {
     title: "陽だまりのセツナ",
     artist: "赤乃わい",
     description:
-      "メインの部屋に展示されている一冊です。正式な曲紹介が決まったら、この文章を更新してください。",
+      "時の流れと別れを描きながら、大切な人との絆が優しく歌われている曲。",
     youtubeUrl:
-      "https://www.youtube.com/results?search_query=陽だまりのセツナ",
-    spotifyUrl: "https://open.spotify.com/search/陽だまりのセツナ",
+      "https://youtu.be/D2gWpqM2GFQ?si=DbZ6sWPn7MMJiioA",
+    spotifyUrl: "https://open.spotify.com/intl-ja/track/6aDvQRsMa4QM7nXDA8AVYN?si=cd998adb231247fb",
   },
   planetes: {
     id: "planetes",
@@ -23,18 +23,18 @@ export const songs = {
     artist: "seiza feat. 初音ミク",
     description:
       "夜空に浮かぶ星のような音を、本の表紙と一緒にゆっくり味わってみてください。",
-    youtubeUrl: "https://www.youtube.com/results?search_query=seiza+プラネテス",
-    spotifyUrl: "https://open.spotify.com/search/seiza%20プラネテス",
+    youtubeUrl: "https://youtu.be/UPztJYCAnO4?si=d1d7j1ae4NnYKf2M",
+    spotifyUrl: "https://open.spotify.com/intl-ja/track/1juR8DDDsEBhTPkMcggme2?si=92120924745c4306",
   },
   marySue: {
     id: "marySue",
     title: "メアリー・スーの憂鬱",
-    artist: "ナナホシ管弦楽団",
+    artist: "鳥籠の中で僕たちは、 feat.むト",
     description:
       "物語の中へ入り込むような一曲です。3D空間で本を眺めてから音楽を聴いてみましょう。",
     youtubeUrl:
       "https://www.youtube.com/results?search_query=メアリー・スーの憂鬱",
-    spotifyUrl: "https://open.spotify.com/search/メアリー・スーの憂鬱",
+    spotifyUrl: "https://open.spotify.com/intl-ja/track/2dw7cXNh8cxRc0gxJOcF4K?si=00591b5b38e34069",
   },
   dec: {
   id: "dec",

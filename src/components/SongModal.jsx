@@ -1,7 +1,7 @@
 import { assets } from "../assets.js";
 import Modal from "./Modal.jsx";
 
-export default function SongModal({ song, onClose }) {
+export default function SongModal({ song, onClose,backgroundColor }) {
   /*
    * songには、App.jsxが曲IDから探した一曲分のデータが入ります。
    * songがnullならBoolean(song)はfalseになり、Modalは表示されません。
@@ -12,6 +12,7 @@ export default function SongModal({ song, onClose }) {
       titleId="song-title"
       onClose={onClose}
       className="song-window"
+      style={{backgroundColor}}
     >
       {/* songが存在するときだけ、曲名・説明・リンクを読み取ります。 */}
       {song && (

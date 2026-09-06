@@ -99,6 +99,7 @@ export default function App() {
       <LoadingScreen key={currentRoomId} isReady={isSceneReady} />
       <SongModal
         song={selectedSong}
+        backgroundColor={currentRoom.modalbgColor}
         // nullへ戻すとsongもnullになり、条件付き表示によって閉じます。
         onClose={() => setSelectedSongId(null)}
       />

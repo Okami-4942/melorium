@@ -6,6 +6,7 @@ export default function Modal({
   onClose,
   children,
   className = "",
+  style,
 }) {
   /*
    * Modalは、曲画面とメニュー画面で共通する「開く・閉じる」を担当します。
@@ -41,6 +42,7 @@ export default function Modal({
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section
         className={`modal-window ${className}`}
+        style={style}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

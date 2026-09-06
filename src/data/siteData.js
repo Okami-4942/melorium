@@ -38,7 +38,7 @@ export const songs = {
   },
   dec: {
     id: "dec",
-    title: "Dec",
+    title: "Dec.",
     artist: "kanaria",
     description: "疾走感のあるサウンドに、切ない恋と自己犠牲的な想いを重ねた楽曲。",
     youtubeUrl: "https://youtu.be/9xbT8OZcDJQ?si=W2VrpYv3CFY72zBJ",

@@ -116,14 +116,7 @@ function addFloor(scene, floorColor) {
   scene.add(floor);
 }
 
-// 一度移動を始めたあと、次フレームで同じ処理を繰り返さないための印です。
-let isTransitioning = false;
 
-// 移動に使うドア本体と移動先を保存します。
-const transitionDoors = [];
-
-// 距離計算で同じVector3を再利用します。
-const doorWorldPosition = new THREE.Vector3();
 
 
 
@@ -137,23 +130,32 @@ export function createMeloriumScene({
   onInteractionChange,
   onChangeRoom,
 }) {
+
+  // 一度移動を始めたあと、次フレームで同じ処理を繰り返さないための印です。
+  let isTransitioning = false;
+
+  // 移動に使うドア本体と移動先を保存します。
+  const transitionDoors = [];
+
+  // 距離計算で同じVector3を再利用します。
+  const doorWorldPosition = new THREE.Vector3();
   /*
    * Reactから受け取る値:
    * - container: canvasを追加するdiv
    * - onReady: 全素材を読み終えたことをReactへ伝える関数
    */
 
- const scene = new THREE.Scene();
-scene.background = new THREE.Color(roomConfig.backgroundColor);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(roomConfig.backgroundColor);
 
-const camera = new THREE.PerspectiveCamera(
-  roomConfig.cameraFov,
-  1,
-  0.1,
-  1000,
-);
+  const camera = new THREE.PerspectiveCamera(
+    roomConfig.cameraFov,
+    1,
+    0.1,
+    1000,
+  );
 
-camera.position.set(0, PLAYER_HEIGHT, 0);
+  camera.position.set(0, PLAYER_HEIGHT, 0);
   addCrosshair(camera);
   scene.add(camera);
 
@@ -417,29 +419,29 @@ camera.position.set(0, PLAYER_HEIGHT, 0);
   };
 
   const checkDoorTransition = () => {
-  // モーダル中、移動開始後、Pointer Lock前は判定しません。
-  if (isPaused || isTransitioning || !controls.isLocked) return;
+    // モーダル中、移動開始後、Pointer Lock前は判定しません。
+    if (isPaused || isTransitioning || !controls.isLocked) return;
 
-  for (const door of transitionDoors) {
-    // ドアのシーン全体での位置を取得します。
-    door.object.getWorldPosition(doorWorldPosition);
+    for (const door of transitionDoors) {
+      // ドアのシーン全体での位置を取得します。
+      door.object.getWorldPosition(doorWorldPosition);
 
-    // 高さYを無視し、床と同じXZ平面での距離を計算します。
-    const distance = Math.hypot(
-      camera.position.x - doorWorldPosition.x,
-      camera.position.z - doorWorldPosition.z,
-    );
+      // 高さYを無視し、床と同じXZ平面での距離を計算します。
+      const distance = Math.hypot(
+        camera.position.x - doorWorldPosition.x,
+        camera.position.z - doorWorldPosition.z,
+      );
 
-    if (distance <= DOOR_TRIGGER_DISTANCE) {
-      // Reactのstate更新より先に印を付け、連続実行を防ぎます。
-      isTransitioning = true;
-      pressedKeys.clear();
-      controls.unlock();
-      onChangeRoom(door.destinationRoomId);
-      return;
+      if (distance <= DOOR_TRIGGER_DISTANCE) {
+        // Reactのstate更新より先に印を付け、連続実行を防ぎます。
+        isTransitioning = true;
+        pressedKeys.clear();
+        controls.unlock();
+        onChangeRoom(door.destinationRoomId);
+        return;
+      }
     }
-  }
-};
+  };
 
 
   const renderFrame = () => {

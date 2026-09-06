@@ -37,21 +37,21 @@ export const songs = {
     spotifyUrl: "https://open.spotify.com/intl-ja/track/2dw7cXNh8cxRc0gxJOcF4K?si=00591b5b38e34069",
   },
   dec: {
-  id: "dec",
-  title: "Dec",
-  artist: "kanaria",
-  description: "疾走感のあるサウンドに、切ない恋と自己犠牲的な想いを重ねた楽曲。",
-  youtubeUrl: "https://youtu.be/9xbT8OZcDJQ?si=W2VrpYv3CFY72zBJ",
-  spotifyUrl: "https://open.spotify.com/intl-ja/track/44PT3ussI7vcQb6QYJhLF8?si=e027ef64c8ef4a2a",
-},
-sleepwalk: {
-  id: "sleepwalk",
-  title: "Sleepwalk",
-  artist: "なとり",
-  description: "踊れる心地よさの裏に、不安や違和感が潜む夜のような楽曲。",
-  youtubeUrl: "https://youtu.be/l0vUtRwObp4?si=GFl52qChD0Dn62Hr",
-  spotifyUrl: "https://open.spotify.com/intl-ja/track/5WHq3vcWRRb9xeQKgv7lAi?si=839f1d1222a741c6",
-},
+    id: "dec",
+    title: "Dec",
+    artist: "kanaria",
+    description: "疾走感のあるサウンドに、切ない恋と自己犠牲的な想いを重ねた楽曲。",
+    youtubeUrl: "https://youtu.be/9xbT8OZcDJQ?si=W2VrpYv3CFY72zBJ",
+    spotifyUrl: "https://open.spotify.com/intl-ja/track/44PT3ussI7vcQb6QYJhLF8?si=e027ef64c8ef4a2a",
+  },
+  sleepwalk: {
+    id: "sleepwalk",
+    title: "Sleepwalk",
+    artist: "なとり",
+    description: "踊れる心地よさの裏に、不安や違和感が潜む夜のような楽曲。",
+    youtubeUrl: "https://youtu.be/l0vUtRwObp4?si=GFl52qChD0Dn62Hr",
+    spotifyUrl: "https://open.spotify.com/intl-ja/track/5WHq3vcWRRb9xeQKgv7lAi?si=839f1d1222a741c6",
+  },
 };
 
 // UI課題で作るMenuModalは、この配列をmap()して要素の数だけリンクを表示します。

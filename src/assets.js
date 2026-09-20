@@ -1,10 +1,3 @@
-/*
- * 画像や3Dモデルの読み込み場所を一つにまとめたファイルです。
- *
- * Viteでは素材をimportすると、開発時とbuild後の両方で使えるURLへ変換されます。
- * GLBはJavaScriptとして解釈せずURLとして扱いたいため、末尾に「?url」を付けています。
- * 新しい画像やモデルを追加するときも、まずこのファイルへimportを追加してください。
- */
 import doorModelUrl from "../models/door.glb?url";
 import tableModelUrl from "../models/table.glb?url";
 import greenBackUrl from "../images/green-ura.jpg";
@@ -28,7 +21,6 @@ import decSpineUrl from "../images/Dec1背.png";
 import sleepwalkCoverUrl from "../images/Sleepwalk.png";
 import sleepwalkSpineUrl from "../images/Sleepwalk3背.png";
 
-// 用途別のオブジェクトにまとめることで、利用側がassets.models.doorのように読めます。
 export const assets = {
   models: {
     door: doorModelUrl,

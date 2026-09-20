@@ -19,7 +19,6 @@ export default [
       },
     },
     plugins: {
-      // Hooksの使い方と、開発中のReact更新に関する間違いを検査します。
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },

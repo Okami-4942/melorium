@@ -1,6 +1,5 @@
 import { assets } from "../assets.js";
 
-// ドアの三つの設置場所は、全ての部屋で共通です。
 const doorPositions = {
   east: {
     position: [5.8, 1.95, 0],
@@ -16,7 +15,6 @@ const doorPositions = {
   },
 };
 
-// 旧main.jsと同じ高さへ本を置くための計算です。
 const mainBookHeight = 1.05 * (790 / 569);
 
 export const rooms = {

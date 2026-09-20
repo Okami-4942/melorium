@@ -1,11 +1,3 @@
-/*
- * 画面に表示する文章やリンクは、JSXやThree.jsの処理から分離してここで管理します。
- * データと見た目を分けると、曲を追加するときにコンポーネントをコピーせずに済みます。
- * songsのキーと、3D本に付けるsongIdは必ず同じ文字列にしてください。
- *
- * 注意: artist、description、外部URLには今回補った仮データが含まれます。
- * 公開前に、制作者が意図した正式な内容へ置き換えてください。
- */
 export const songs = {
   hidamari: {
     id: "hidamari",
@@ -54,7 +46,6 @@ export const songs = {
   },
 };
 
-// UI課題で作るMenuModalは、この配列をmap()して要素の数だけリンクを表示します。
 export const menuLinks = [
   {
     label: "使用曲プレイリスト",

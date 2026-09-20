@@ -4,10 +4,9 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
-  // distはViteが自動生成するため、人が書いたコードの検査対象から外します。
   { ignores: ["dist"] },
   {
-    // JavaScriptとJSXの両方へ、同じ検査ルールを適用します。
+
     files: ["**/*.{js,jsx}"],
     languageOptions: {
       ecmaVersion: "latest",
